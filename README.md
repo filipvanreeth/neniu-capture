@@ -211,7 +211,7 @@ endpoints verzorgen. JavaScript gebruikt gewone ES-modules, zonder framework:
 - `assets/js/camera.js`: camerastream en camerawissel.
 - `assets/js/location.js`: browserlocatie.
 - `assets/js/verification-api.js`: sessies en uploads.
-- `assets/js/photo.js`: opname en aparte geannoteerde preview.
+- `assets/js/photo.js`: opname en fotopreview zonder tekstoverlay.
 - `assets/css/app.css`: gedeelde styling.
 
 Installeer en bouw de frontend na een checkout:

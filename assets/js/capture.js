@@ -61,8 +61,8 @@ capture.addEventListener('click', async () => {
         const position = await getLocation();
         const photo = takePhoto(video, t('camera_not_ready'));
         status.textContent = t('saving_photo');
-        const data = await api.save(session, photo, position);
-        drawPreview(canvas, photo, data.code, position);
+        await api.save(session, photo, position);
+        drawPreview(canvas, photo);
         video.hidden = true;
         canvas.hidden = false;
         camera.stop();
