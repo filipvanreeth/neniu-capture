@@ -5,3 +5,10 @@
 /node_modules/
 /public/build/
 /.lando.local.yml
+
+# Local configuration can contain secrets.
+.env
+.env.*
+!.env.example
+
+/.lando/npm-cache/

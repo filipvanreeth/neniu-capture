@@ -9,6 +9,7 @@ services:
     composer_version: '2'
     overrides:
       environment:
+        APP_ENV: development
         VITE_DEV_SERVER: https://vite-neniu-verify.lndo.site
     config:
       php: .lando/php.ini
@@ -24,11 +25,12 @@ services:
     scanner: false
     overrides:
       environment:
+        npm_config_cache: /app/.lando/npm-cache
         VITE_HOST: 0.0.0.0
         VITE_DEV_ORIGIN: https://vite-neniu-verify.lndo.site
         VITE_BACKEND_ORIGIN: https://neniu-verify.lndo.site
     build:
-      - npm ci
+      - npm ci --prefer-offline --no-audit --no-fund --loglevel=info --fetch-timeout=30000 --fetch-retries=1
 
 proxy:
   appserver:

@@ -239,12 +239,11 @@ VITE_BACKEND_ORIGIN=http://localhost:8000 npm run dev
 Start de PHP-server in een tweede terminal:
 
 ```sh
-VITE_DEV_SERVER=http://localhost:5173 php -S localhost:8000 -t public dev-router.php
+APP_ENV=development VITE_DEV_SERVER=http://localhost:5173 php -S localhost:8000 -t public dev-router.php
 ```
 
-Open `http://localhost:8000`. `VITE_DEV_SERVER` moet in de omgeving van PHP staan;
-zonder deze variabele gebruikt PHP de productiebuild. Een `.env`-bestand wordt
-door PHP niet automatisch geladen. De ontwikkelrouter serveert uitsluitend de
+Open `http://localhost:8000`. `VITE_DEV_SERVER` moet in de PHP-omgeving of `.env` ingesteld zijn;
+zonder deze variabele gebruikt PHP de productiebuild. PHP laadt het `.env`-bestand in de projectroot via de standaard phpdotenv-loader. De ontwikkelrouter serveert uitsluitend de
 gebouwde assets rechtstreeks en stuurt overige paden door naar de applicatie.
 
 ### Ontwikkelen binnen Lando
@@ -263,8 +262,10 @@ De assets en HMR-WebSocket lopen via `https://vite-neniu-verify.lndo.site`;
 vertrouw de Lando-CA zodat de browser beide HTTPS-hosts accepteert. De proxy
 gebruikt de interne poort 5173; de browser gebruikt de normale HTTPS-poort 443.
 Vite luistert binnen de container via HTTP op `0.0.0.0:5173`. De Lando-proxy
-verzorgt HTTPS met de door Lando gegenereerde certificaten. npm-afhankelijkheden worden tijdens de Node-build
-met `npm ci` geïnstalleerd. De Vite-server start bewust via `lando npm run dev`.
+verzorgt HTTPS met de door Lando gegenereerde certificaten. Tijdens de eerste
+build en bij `lando rebuild` installeert de Node-service dependencies automatisch
+met `npm ci --prefer-offline --no-audit --no-fund`. De Vite-server start via
+`lando npm run dev`.
 
 Andere beschikbare commando's:
 
@@ -347,3 +348,73 @@ ontwikkelrouter; dependencies en gegenereerde bestanden worden niet meegenomen.
 Controleer na formatteren de resterende meldingen met `composer cs` en voer
 `composer lint` en `composer test` uit. De formatter is een ontwikkelafhankelijkheid
 en wordt bij `composer install --no-dev` niet op productie geïnstalleerd.
+
+
+## Omgevingsconfiguratie en .env
+
+PHP laadt `.env` rechtstreeks in `public/index.php` met
+`Dotenv::createImmutable($projectRoot)->safeLoad()`, zonder eigen configuratieklasse. Kopieer bij installatie
+`.env.example` naar `.env` in de projectroot (naast `composer.json`, buiten
+`public/`) en beperk de bestandsrechten, bijvoorbeeld met `chmod 600 .env`.
+`.env` en `.env.*` worden door Git genegeerd; alleen `.env.example` wordt gedeeld.
+Bestaande server-/containeromgevingsvariabelen hebben voorrang boven `.env`.
+PHP laadt alleen `.env`, geen `.env.local` of omgevingsspecifieke varianten.
+Instellingen worden rechtstreeks gelezen uit `$_ENV` en `$_SERVER`;
+`getenv()` wordt niet door de loader aangepast.
+
+- `APP_ENV`: `production` (standaard), `development` of `testing`.
+- `STORAGE_PATH`: standaard `storage`, relatief aan de projectroot of absoluut.
+  Kies altijd een pad buiten `public/`.
+- `TRUSTED_PROXIES`: kommagescheiden exacte proxy-IP-adressen, standaard leeg.
+- `VITE_DEV_SERVER`: wordt alleen gebruikt bij development/testing en genegeerd op productie.
+
+Zonder `.env` blijven de standaardinstellingen van toepassing. Een onleesbaar
+of ongeldig `.env`-bestand levert een algemene HTTP 500 op, zonder
+configuratiewaarden of parserdetails in de respons. PHP-fouten worden gelogd; foutweergave staat standaard uit.
+De lokale `.env` gebruikt development; Lando geeft zijn eigen
+developmentwaarden en Vite-URL door. Publiceer de lokale `.env` niet op productie;
+maak daar een apart bestand of gebruik de serveromgeving.
+
+Vite leest alleen `VITE_`-instellingen voor zijn configuratie en geeft door
+`envPrefix: []` geen .env-waarden automatisch aan browsercode door. Gebruik
+nooit geheimen voor browserconfiguratie; Twig geeft alleen expliciet gekozen
+publieke gegevens mee. Een `.env`-bestand versleutelt gegevens niet en vervangt
+geen toegangsbeveiliging of veilig secretbeheer. Plaats er alleen werkelijk
+gebruikte instellingen in; de applicatie heeft momenteel geen APP_KEY nodig.
+
+
+## PHP-instellingen
+
+Alle PHP-ini-instellingen staan in `.lando/php.ini`, waaronder uploadlimieten,
+geheugenlimiet, tijdzone, `error_reporting`, `display_errors`,
+`display_startup_errors` en `log_errors`. De applicatie gebruikt geen `ini_set()`
+of `error_reporting()` en kent geen `APP_DEBUG`-instelling.
+
+Lando laadt dit bestand via `services.appserver.config.php`. Voer na wijzigingen
+`lando rebuild -y` uit om ze toe te passen. Neem voor productie dezelfde
+instellingen over in de server-`php.ini` of een aanvullend `.ini`-bestand in de
+PHP-configuratiemap en herlaad PHP-FPM/Apache. Configureer ook het logdoel daar.
+Laat foutweergave op productie uitgeschakeld; eventuele lokale afwijkingen horen
+uitsluitend in de PHP-configuratie, niet in `.env` of applicatiecode.
+
+
+### Frontenddependencies in Lando
+
+De Node-build voert `npm ci --prefer-offline --no-audit --no-fund` uit.
+Na een wijziging van `package-lock.json` kun je `lando npm ci` uitvoeren zonder
+de containers opnieuw op te bouwen. Een audit kan afzonderlijk met
+`lando npm audit` worden uitgevoerd.
+
+Na wijzigingen in `.lando.yml` is een rebuild nodig. Downloads kunnen de eerste
+build vertragen; laat niet meerdere start-/rebuildcommando's tegelijk draaien.
+
+
+### Npm-cache behouden bij een rebuild
+
+De Node-service gebruikt `/app/.lando/npm-cache` als npm-cache. Deze map staat
+op de projectmount, buiten `public/`, en wordt niet gecommit. Daardoor blijven
+opgehaalde pakketten beschikbaar wanneer Lando de Node-container opnieuw maakt.
+`npm ci` blijft bij iedere build de dependencies volgens het lockbestand opnieuw
+installeren, maar kan daarvoor de bewaarde pakketbestanden gebruiken.
+De build toont downloadvoortgang en beperkt de retry-/time-outinstellingen.
+Een eerste download of een nieuw pakket kan nog steeds tijd kosten.
