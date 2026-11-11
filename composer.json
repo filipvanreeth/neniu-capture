@@ -5,9 +5,10 @@
     "license": "proprietary",
     "require": {
         "php": "^8.1",
+        "ext-json": "*",
         "ext-pdo": "*",
         "ext-pdo_sqlite": "*",
-        "ext-json": "*"
+        "nikic/fast-route": "^1.3"
     },
     "autoload": {
         "psr-4": {
@@ -21,7 +22,10 @@
             "@php -l translations/en.php",
             "find src tests -name \"*.php\" -exec php -l {} \\;"
         ],
-        "test": "@php tests/verification.php"
+        "test": [
+            "@php tests/verification.php",
+            "@php tests/routing.php"
+        ]
     },
     "config": {
         "sort-packages": true,

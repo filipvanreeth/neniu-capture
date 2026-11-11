@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Neniu\Verify;
 
 use Throwable;
+use FastRoute\Dispatcher;
 
 final class Application
 {
@@ -14,11 +15,20 @@ final class Application
         private string $locale,
         private Clock $clock,
         private ClientIpResolver $ipResolver,
+        private Router $router,
     ) {
     }
 
     public function handle(): array
     {
+        $route = $this->router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+        if ($route[0] === Dispatcher::NOT_FOUND) {
+            $this->respond(['error' => t('route_not_found')], 404);
+        }
+        if ($route[0] === Dispatcher::METHOD_NOT_ALLOWED) {
+            header('Allow: ' . implode(', ', $route[1]));
+            $this->respond(['error' => t('method_not_allowed')], 405);
+        }
         $locale = $this->locale;
         $receivedAt = $this->clock->now();
         $requestId = bin2hex(random_bytes(16));
@@ -33,7 +43,7 @@ final class Application
         }
 
         // Upload endpoint
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($route[1] === 'upload') {
             if (($_POST['action'] ?? '') === 'session') {
                 try {
                     $this->respond($verification->issue());
@@ -146,32 +156,30 @@ final class Application
 
             $this->respond([
                 'code' => $code,
-                'url' => '?verify=' . $code . '&lang=' . rawurlencode($locale)
+                'url' => $this->router->verificationUrl($code, $locale)
             ]);
         }
 
-        // Verification endpoint
-        $record = null;
-        $hashValid = false;
-
-        if (isset($_GET['verify'])) {
-            try {
-                $record = is_string($_GET['verify']) ? $records->find($_GET['verify']) : null;
-            } catch (Throwable $error) {
-                error_log('Record lookup failed: ' . $error->getMessage());
-                $this->respond(['error' => t('storage_unavailable')], 500);
-            }
-
-            if ($record) {
-                $bytes = base64_decode($record['image']['base64'], true);
-                $hashValid = $bytes !== false &&
-                    hash_equals(
-                        $record['image']['sha256'],
-                        hash('sha256', $bytes)
-                    );
-            }
+        if ($route[1] === 'verify') {
+            return $this->verify($records, $route[2]['code']);
         }
-        return ['record' => $record, 'hashValid' => $hashValid];
+        return ['record' => null, 'hashValid' => false, 'isVerification' => false];
+    }
+
+    private function verify(RecordRepository $records, string $code): array
+    {
+        try {
+            $record = $records->find($code);
+        } catch (Throwable $error) {
+            error_log('Record lookup failed: ' . $error->getMessage());
+            $this->respond(['error' => t('storage_unavailable')], 500);
+        }
+        if ($record === null) {
+            http_response_code(404);
+        }
+        $bytes = $record !== null ? base64_decode($record['image']['base64'], true) : false;
+        $hashValid = $bytes !== false && hash_equals($record['image']['sha256'], hash('sha256', $bytes));
+        return ['record' => $record, 'hashValid' => $hashValid, 'isVerification' => true];
     }
 
     private function respond(array $data, int $status = 200): never

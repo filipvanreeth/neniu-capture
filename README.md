@@ -143,3 +143,22 @@ metadatabehoud, proxyvertrouwen, timestamps, eenmalig gebruik, verval en rollbac
 - `src/Clock.php`: levert UTC-tijden en converteert browsertimestamps.
 
 Voer na het bijwerken van de autoloadconfiguratie `composer dump-autoload` uit.
+
+
+## Routes
+
+Routing gebruikt `nikic/fast-route` via `src/Router.php`:
+
+- `GET /`: opnamepagina (`/index.php` blijft ook werken).
+- `POST /`: sessie aanvragen (`action=session`) of uploaden (`action=save`).
+- `GET /verify/{code}`: afzonderlijke verificatiepagina voor een code van 32
+  hexadecimale tekens. Een ontbrekend record geeft HTTP 404.
+
+De taal blijft in `?lang=en` staan. Verificatie verloopt uitsluitend via
+`/verify/{code}`. Onbekende routes geven HTTP 404;
+onjuiste methodes HTTP 405 met een `Allow`-header.
+
+Apache moet `mod_rewrite` en `.htaccess`-regels toestaan. De rootconfiguratie
+stuurt niet-bestaande paden naar `index.php`. Configureer bij Nginx een
+vergelijkbare front-controllerregel en behoud de blokkering van opslag en vendor.
+Lokaal kan de applicatie worden gestart met `php -S localhost:8000 index.php`.

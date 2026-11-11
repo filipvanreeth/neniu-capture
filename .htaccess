@@ -1,1 +1,5 @@
-# FallbackResource /index.php
+# Route application paths through the front controller; retain file-level rules.
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]

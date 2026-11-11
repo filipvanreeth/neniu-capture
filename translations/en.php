@@ -37,6 +37,8 @@ return [
     'storage_unavailable' => 'Records are temporarily unavailable. Please try again later.',
     'invalid_session' => 'This verification session has expired or has already been used. Please take a new photo.',
     'invalid_timestamps' => 'Valid capture and location measurement timestamps are required.',
+    'route_not_found' => 'This page could not be found.',
+    'method_not_allowed' => 'This HTTP method is not allowed for this endpoint.',
     'invalid_action' => 'This request is not supported.',
     'upload_too_large' => 'The upload exceeds the allowed size.',
     'invalid_image' => 'The photo must be a valid JPEG image.',
