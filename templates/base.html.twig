@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ t('page_title') }}</title>
     {% if assets.devClient %}
@@ -13,8 +14,12 @@
 
 <body class="m-0 bg-zinc-100 p-6 font-sans text-base leading-[normal] text-black max-[480px]:p-3">
     <main class="box-content mx-auto max-w-[540px] rounded-[14px] bg-white p-6 max-[480px]:p-5">
-        <h1 class="my-[0.67em] text-[2em] font-bold">{{ t('app_name') }}</h1>
-        <p class="my-4">{{ t('intro') }}</p>
+        <header class="mb-7">
+            <h1 class="text-3xl font-semibold leading-tight tracking-tight text-zinc-950">{{ t('app_name') }}</h1>
+            {% block introduction %}
+                <p class="mt-3 text-base leading-relaxed text-zinc-600">{{ t('intro') }}</p>
+            {% endblock %}
+        </header>
 
         {% block content %}{% endblock %}
     </main>

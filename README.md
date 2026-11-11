@@ -457,3 +457,38 @@ opgehaalde pakketten beschikbaar wanneer Lando de Node-container opnieuw maakt.
 installeren, maar kan daarvoor de bewaarde pakketbestanden gebruiken.
 De build toont downloadvoortgang en beperkt de retry-/time-outinstellingen.
 Een eerste download of een nieuw pakket kan nog steeds tijd kosten.
+
+
+## Een fotolink delen
+
+Na een succesvolle upload toont de capturepagina een volledige, kopieerbare
+link naar `/verify/{code}`. De gebruiker kan de link kopiëren om zelf door te
+sturen, of het resultaat in een nieuw tabblad openen. Bij geweigerde of
+ontbrekende clipboardtoegang wordt de link geselecteerd voor handmatig kopiëren.
+Bij het starten van een nieuwe opname verdwijnt de vorige link uit beeld;
+een nieuwe link verschijnt pas nadat die foto succesvol is opgeslagen.
+De taal en een eventuele submap blijven in de URL behouden. Iedereen met de
+link kan de foto en bijbehorende locatie bekijken, zoals vooraf vermeld.
+
+
+## OpenStreetMap-kaart
+
+De verificatiepagina toont een kaart via Leaflet 1.9 en OpenStreetMap, zonder
+API-key. De kaart laadt pas na klikken op **Show map**. Het punt toont de
+opgeslagen browserlocatie; de cirkel gebruikt de gerapporteerde nauwkeurigheid
+in meters. Dit is geen onafhankelijke bevestiging van de locatie.
+Leaflet wordt via npm/Vite gebundeld, niet via een externe JavaScript-CDN.
+
+Kaarttegels komen standaard van `https://tile.openstreetmap.org/{z}/{x}/{y}.png`.
+`MAP_TILE_URL` kan via `.env` of de serveromgeving worden ingesteld. Behoud de
+zichtbare OpenStreetMap-attributie en kies alleen een compatibele provider met
+dezelfde attributievereisten, of pas de attributie bij een providerwissel aan.
+De browser gebruikt normale HTTP-caching. Er is geen prefetch of offline-download.
+De referrer-policy stuurt alleen de site-origin naar de tegeldienst, niet de
+verificatiecode in het paginapad. De tegeldienst ontvangt wel het IP-adres van
+de bezoeker en aanvragen voor het bekeken kaartgebied.
+
+De openbare tegeldienst is beschikbaar op best-effortbasis, zonder SLA, en is
+geen onbeperkte gratis API. Volg de officiële gebruiksvoorwaarden en kies bij
+veel verkeer een passende OSM-tegelprovider of eigen hosting:
+https://operations.osmfoundation.org/policies/tiles/

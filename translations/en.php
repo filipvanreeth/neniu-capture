@@ -3,30 +3,47 @@
 declare(strict_types=1);
 
 return [
-    'page_title' => 'Neniu Capture — Photo and location record',
-    'app_name' => 'Neniu Capture',
+    'page_title' => 'Neniu\'s official verification tool',
+    'app_name' => 'Neniu\'s official verification tool',
     'intro' => 'Capture a photo with your current location and save them together in a record you can'
         . ' review and share.',
-    'not_found' => 'No record was found for this verification code. Please check the link and try again.',
-    'verification_result' => 'Photo and location record',
-    'integrity' => 'Photo integrity check',
+    'not_found' => 'No capture was found for this verification code. Please check the link and try again.',
+    'verification_result' => 'Verification Results',
+    'integrity' => 'Integrity check',
     'valid' => 'The photo matches its stored checksum',
     'invalid' => 'The photo does not match its stored checksum',
-    'photo_alt' => 'Photo saved with this record',
-    'code' => 'Verification code',
-    'timestamp' => 'Saved at (UTC)',
-    'gps' => 'Location coordinates',
-    'accuracy' => 'Reported location accuracy',
+    'photo_alt' => 'Photo saved',
+    'map_title' => 'Reported location on the map',
+    'map_notice' => 'The circle shows the browser-reported accuracy. Opening the map loads tiles from OpenStreetMap.',
+    'show_map' => 'Show map',
+    'map_tile_error' => 'Some map tiles could not be loaded. The recorded coordinates remain available above.',
+    'map_requires_js' => 'Enable JavaScript to view the map. The coordinates are listed above.',
+    'record_details' => 'Captured details',
+    'code' => 'Reference ID',
+    'timestamp' => 'Received at',
+    'gps' => 'Browser location',
+    'accuracy' => 'Reported accuracy',
     'meters' => 'meters',
     'gps_notice' => 'Location coordinates and accuracy are provided by your browser and have not been'
         . ' independently verified. The photo integrity check compares the saved photo with its'
         . ' stored checksum; it does not verify identity or location.',
-    'new_capture' => 'Create a new record',
-    'consent_notice' => 'Select “Start camera” and allow camera access to preview your photo. Select “Take and'
-        . ' save photo” to request your location and save the photo with its coordinates. We also'
-        . ' store your IP address, browser information, capture and location measurement times,'
-        . ' and technical photo details. Anyone with the verification link can view the saved'
-        . ' photo and location.',
+    'new_capture' => 'Create a new capture',
+    'capture_intro' => 'Use your camera to take a clear photo of the requested person, document or item.'
+        . ' Send the resulting link back to the person who sent you this page'
+        . ' so they can assess the authenticity of the material.',
+    'capture_guide' => 'How it works',
+    'camera_step_title' => 'Open your camera',
+    'camera_step_description' => 'Select “Start camera” and allow camera access.'
+        . ' Make sure the requested person, document or item is clearly visible.',
+    'save_step_title' => 'Take and save your photo',
+    'save_step_description' => 'Select “Take and save photo” to save your photo with your location.'
+        . ' You\'ll receive a link to share for review.',
+    'capture_privacy_title' => 'Before you send',
+    'capture_data_title' => 'What we save',
+    'capture_data_description' => 'Your photo and location, IP address, browser information, capture and location'
+        . ' measurement times, and technical photo details.',
+    'capture_access_title' => 'Who can view it',
+    'capture_access_description' => 'Anyone with the verification link can view your saved photo and location.',
     'start_camera' => 'Start camera',
     'switch_camera' => 'Switch camera',
     'capture' => 'Take and save photo',
@@ -39,10 +56,16 @@ return [
     'camera_not_ready' => 'The camera is not ready yet. Wait for the preview and try again.',
     'saving_photo' => 'Saving photo...',
     'save_failed' => 'The photo could not be saved. Please try again.',
-    'view_result' => 'View saved record',
+    'share_title' => 'Your photo link',
+    'share_instructions' => 'Copy this link and send it to the person who requested your photo.',
+    'share_link' => 'Photo link',
+    'copy_link' => 'Copy link',
+    'link_copied' => 'Link copied. You can now paste and send it.',
+    'copy_link_manually' => 'Copy the selected link manually and send it.',
+    'view_result' => 'View saved capture',
     'photo_saved' => 'Your photo and location have been saved successfully.',
     'error' => 'Error: {message}',
-    'storage_unavailable' => 'Records are temporarily unavailable. Please try again later.',
+    'storage_unavailable' => 'Captures are temporarily unavailable. Please try again later.',
     'invalid_session' => 'This verification session has expired or has already been used. Please take a new photo.',
     'invalid_timestamps' => 'Valid capture and location measurement timestamps are required.',
     'route_not_found' => 'This page could not be found.',
@@ -53,5 +76,5 @@ return [
     'invalid_image_data' => 'The photo could not be read or exceeds the allowed size.',
     'invalid_gps' => 'Valid location coordinates and accuracy are required. Please allow location access'
         . ' and try again.',
-    'storage_failed' => 'Your record could not be saved. Please try again.',
+    'storage_failed' => 'Your capture could not be saved. Please try again.',
 ];

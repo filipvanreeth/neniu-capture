@@ -2,20 +2,61 @@
 
 {% block content %}
     {% if not record %}
-        <p class="my-4">{{ t('not_found') }}</p>
+        <p class="status-label my-4" data-status="warning" role="status">{{ t('not_found') }}</p>
     {% else %}
-        <h2 class="my-[0.83em] text-2xl font-bold">{{ t('verification_result') }}</h2>
-        <p class="my-4">{{ t('integrity') }}:
-            <strong>{{ t(hashValid ? 'valid' : 'invalid') }}</strong>
-        </p>
+        <h2 class="mb-4 text-xl font-semibold tracking-tight text-zinc-900">{{ t('verification_result') }}</h2>
+        <div class="status-label my-4" data-status="{{ hashValid ? 'success' : 'error' }}" role="status">
+            <div>
+                <p class="font-semibold">{{ t('integrity') }}</p>
+                <p class="mt-0.5 font-normal">{{ t(hashValid ? 'valid' : 'invalid') }}</p>
+            </div>
+        </div>
         {% if hashValid %}
             <img class="my-3 w-full rounded-lg" alt="{{ t('photo_alt') }}" src="data:image/jpeg;base64,{{ record.image.base64 }}">
         {% endif %}
-        <p class="my-4">{{ t('code') }}: {{ record.code }}</p>
-        <p class="my-4">{{ t('timestamp') }}: {{ record.created_at }}</p>
-        <p class="my-4">{{ t('gps') }}: {{ record.location.latitude }}, {{ record.location.longitude }}</p>
-        <p class="my-4">{{ t('accuracy') }}: {{ record.location.accuracy_meters }} {{ t('meters') }}</p>
-        <p class="my-4"><small>{{ t('gps_notice') }}</small></p>
+        <section class="my-5 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-50" aria-labelledby="record-details">
+            <h3 id="record-details" class="border-b border-zinc-200 px-4 py-3 text-sm font-semibold text-zinc-900">{{ t('record_details') }}</h3>
+            <dl class="divide-y divide-zinc-200 text-sm">
+                <div class="grid gap-1 px-4 py-3 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-4">
+                    <dt class="font-medium text-zinc-600">{{ t('code') }}</dt>
+                    <dd class="min-w-0 select-all break-all font-mono text-zinc-900">{{ record.code }}</dd>
+                </div>
+                <div class="grid gap-1 px-4 py-3 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-4">
+                    <dt class="font-medium text-zinc-600">{{ t('timestamp') }}</dt>
+                    <dd class="text-zinc-900">
+                        <time datetime="{{ record.created_at }}">{{ record.created_at|date('d M Y, H:i:s.v', 'UTC') }}</time>
+                        <span class="ml-1 rounded bg-zinc-200 px-1.5 py-0.5 text-xs font-medium text-zinc-700">UTC</span>
+                    </dd>
+                </div>
+                <div class="grid gap-1 px-4 py-3 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-4">
+                    <dt class="font-medium text-zinc-600">{{ t('gps') }}</dt>
+                    <dd class="font-mono text-zinc-900" title="{{ record.location.latitude }}, {{ record.location.longitude }}">{{ record.location.latitude|number_format(6, '.', '') }}, {{ record.location.longitude|number_format(6, '.', '') }}</dd>
+                </div>
+                <div class="grid gap-1 px-4 py-3 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-4">
+                    <dt class="font-medium text-zinc-600">{{ t('accuracy') }}</dt>
+                    <dd class="text-zinc-900" title="{{ record.location.accuracy_meters }} {{ t('meters') }}">{{ record.location.accuracy_meters|round(0, 'ceil')|number_format(0, '.', ',') }} {{ t('meters') }}</dd>
+                </div>
+            </dl>
+        </section>
+        <section class="my-5" aria-labelledby="map-title">
+            <h3 id="map-title" class="mb-2 text-sm font-semibold text-zinc-900">{{ t('map_title') }}</h3>
+            <p class="mb-3 text-sm leading-relaxed text-zinc-600">{{ t('map_notice') }}</p>
+            <button id="show-map" type="button" class="min-h-12 w-full cursor-pointer rounded-lg bg-blue-700 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-blue-800 active:bg-blue-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 motion-reduce:transition-none">{{ t('show_map') }}</button>
+            <div id="location-map" class="relative z-0 h-72 w-full rounded-xl border border-zinc-200" role="region" aria-label="{{ t('map_title') }}"
+                data-latitude="{{ record.location.latitude }}" data-longitude="{{ record.location.longitude }}"
+                data-accuracy="{{ record.location.accuracy_meters }}" data-tile-url="{{ mapTileUrl }}"
+                data-tile-error="{{ t('map_tile_error') }}" hidden></div>
+            <p id="map-status" class="status-label mt-3" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+            <noscript><p class="status-label mt-3" data-status="warning">{{ t('map_requires_js') }}</p></noscript>
+        </section>
+        <p class="status-label my-4 font-normal before:hidden" data-status="info">{{ t('gps_notice') }}</p>
     {% endif %}
-    <a class="text-[#0000ee] underline" href="{{ captureUrl }}">{{ t('new_capture') }}</a>
+    <a class="mt-2 inline-flex min-h-12 w-full items-center justify-center rounded-lg border border-blue-200 bg-blue-50 px-[18px] py-3 text-base font-medium leading-[1.3] text-blue-800 no-underline transition-colors hover:bg-blue-100 active:bg-blue-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 motion-reduce:transition-none" href="{{ captureUrl }}">{{ t('new_capture') }}</a>
+{% endblock %}
+
+
+{% block scripts %}
+    {% if record and assets.verify|default(null) %}
+        <script type="module" src="{{ assets.verify }}"></script>
+    {% endif %}
 {% endblock %}

@@ -51,10 +51,11 @@ $view = $application->handle();
 $renderer = new TemplateRenderer($projectRoot . '/templates', $translator);
 $assets = new ViteAssets(__DIR__ . '/build', $basePath, $viteDevServer);
 echo $renderer->render($view['isVerification'] ? 'verify.html.twig' : 'capture.html.twig', [
-    'assets' => $assets->forPage(!$view['isVerification']),
+    'assets' => $assets->forPage(!$view['isVerification'], $view['isVerification'] && $view['record'] !== null),
     'locale' => $locale,
     'messages' => $translator->messages(),
     'captureUrl' => $router->captureUrl($locale),
     'record' => $view['record'],
     'hashValid' => $view['hashValid'],
+    'mapTileUrl' => $environment['MAP_TILE_URL'] ?? 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
 ]);

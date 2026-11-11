@@ -8,6 +8,8 @@
         "ext-json": "*",
         "ext-pdo": "*",
         "ext-pdo_sqlite": "*",
+        "geocoder-php/nominatim-provider": "^5.8",
+        "guzzlehttp/guzzle": "^8.3",
         "nikic/fast-route": "^1.3",
         "twig/twig": "^3.30",
         "vlucas/phpdotenv": "^5.8"

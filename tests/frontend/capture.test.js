@@ -24,6 +24,7 @@ test('camera switches facing mode and stops the previous stream', async t => {
     const video = { play: async () => {}, style: { removeProperty() {} } };
     const camera = new Camera(video);
     await camera.open('user');
+    assert.equal(video.hidden, false);
     await camera.open('environment', true);
     assert.equal(stopped, 1);
     assert.equal(camera.facingMode, 'environment');
@@ -31,6 +32,7 @@ test('camera switches facing mode and stops the previous stream', async t => {
     camera.stop();
     assert.equal(stopped, 2);
     assert.equal(video.srcObject, null);
+    assert.equal(video.hidden, true);
 });
 
 test('denied camera access leaves the camera restartable', async t => {
@@ -43,6 +45,7 @@ test('denied camera access leaves the camera restartable', async t => {
     const camera = new Camera({ play: async () => {}, style: { removeProperty() {} } });
     await assert.rejects(camera.open(), /Permission denied/);
     assert.equal(camera.stream, null);
+    assert.equal(camera.video.hidden, true);
     denied = false;
     await camera.open();
     assert.ok(camera.stream);

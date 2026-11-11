@@ -15,7 +15,7 @@ final class ViteAssets
     ) {
     }
 
-    public function forPage(bool $capture): array
+    public function forPage(bool $capture, bool $map = false): array
     {
         if ($this->devServer !== null && $this->devServer !== '') {
             $server = rtrim($this->devServer, '/');
@@ -23,6 +23,7 @@ final class ViteAssets
                 'devClient' => $server . '/@vite/client',
                 'stylesheet' => $server . '/assets/css/app.css',
                 'capture' => $capture ? $server . '/assets/js/capture.js' : null,
+                'verify' => $map ? $server . '/assets/js/verify.js' : null,
             ];
         }
         $path = $this->buildDirectory . '/.vite/manifest.json';
@@ -40,6 +41,7 @@ final class ViteAssets
             'devClient' => null,
             'stylesheet' => $url('assets/css/app.css'),
             'capture' => $capture ? $url('assets/js/capture.js') : null,
+            'verify' => $map ? $url('assets/js/verify.js') : null,
         ];
     }
 }

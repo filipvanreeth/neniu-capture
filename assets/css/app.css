@@ -1,6 +1,34 @@
 @import "tailwindcss" source(none);
+@import "leaflet/dist/leaflet.css";
 @source "../../templates";
 
 @theme {
     --font-sans: system-ui, sans-serif;
+}
+
+@layer components {
+    .status-label {
+        @apply flex items-start gap-2.5 rounded-lg border px-3.5 py-3 text-sm font-medium leading-relaxed;
+    }
+
+    /* .status-label::before {
+        content: "";
+        @apply mt-1.5 size-2 shrink-0 rounded-full bg-current;
+    } */
+
+    .status-label[data-status="info"] {
+        @apply border-zinc-200 bg-zinc-50 text-zinc-700;
+    }
+
+    .status-label[data-status="success"] {
+        @apply border-emerald-200 bg-emerald-50 text-emerald-800;
+    }
+
+    .status-label[data-status="warning"] {
+        @apply border-orange-200 bg-orange-50 text-orange-800;
+    }
+
+    .status-label[data-status="error"] {
+        @apply border-red-200 bg-red-50 text-red-800;
+    }
 }

@@ -1,21 +1,68 @@
 {% extends 'base.html.twig' %}
 
-{% block content %}
-    {% set buttonClasses = 'min-h-12 cursor-pointer rounded-lg border-0 bg-[#202020] px-[18px] py-3 text-base leading-[1.3] text-white disabled:opacity-50' %}
-    <p class="my-4">
-        {{ t('consent_notice') }}
-    </p>
+{% block introduction %}
+    <p class="mt-2 text-base leading-relaxed text-zinc-600">{{ t('capture_intro') }}</p>
+{% endblock %}
 
-    <video id="video" class="my-3 w-full rounded-lg" autoplay playsinline muted></video>
+{% block content %}
+    {% set buttonClasses = 'min-h-12 cursor-pointer rounded-lg border px-[18px] py-3 text-base font-medium leading-[1.3] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:border-zinc-200 disabled:bg-zinc-100 disabled:text-zinc-500 motion-reduce:transition-none' %}
+    {% set primaryButtonClasses = 'border-blue-700 bg-blue-700 text-white enabled:hover:bg-blue-800 enabled:active:bg-blue-900 focus-visible:outline-blue-600' %}
+    {% set secondaryButtonClasses = 'border-blue-200 bg-blue-50 text-blue-800 enabled:hover:bg-blue-100 enabled:active:bg-blue-200 focus-visible:outline-blue-600' %}
+    {% set saveButtonClasses = 'border-emerald-700 bg-emerald-700 text-white enabled:hover:bg-emerald-800 enabled:active:bg-emerald-900 focus-visible:outline-emerald-600' %}
+    <section id="capture-guide-section" class="mb-6" aria-labelledby="capture-guide">
+        <h2 id="capture-guide" class="mb-4 text-sm font-semibold text-zinc-900">{{ t('capture_guide') }}</h2>
+        <ol class="space-y-4">
+            <li class="flex gap-3">
+                <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-600" aria-hidden="true">1</span>
+                <div class="pt-0.5">
+                    <h3 class="text-sm font-semibold text-zinc-900">{{ t('camera_step_title') }}</h3>
+                    <p class="mt-1 text-sm leading-relaxed text-zinc-600">{{ t('camera_step_description') }}</p>
+                </div>
+            </li>
+            <li class="flex gap-3">
+                <span class="flex size-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-600" aria-hidden="true">2</span>
+                <div class="pt-0.5">
+                    <h3 class="text-sm font-semibold text-zinc-900">{{ t('save_step_title') }}</h3>
+                    <p class="mt-1 text-sm leading-relaxed text-zinc-600">{{ t('save_step_description') }}</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <video id="video" class="my-3 w-full rounded-lg" autoplay playsinline muted hidden></video>
     <canvas id="canvas" class="my-3 w-full rounded-lg" hidden></canvas>
 
     <div class="grid grid-cols-2 gap-3 max-[480px]:grid-cols-1">
-        <button id="start" class="{{ buttonClasses }}">{{ t('start_camera') }}</button>
-        <button id="switch-camera" class="{{ buttonClasses }}" disabled>{{ t('switch_camera') }}</button>
-        <button id="capture" class="{{ buttonClasses }} col-span-full" disabled>{{ t('capture') }}</button>
+        <button id="start" class="{{ buttonClasses }} {{ primaryButtonClasses }}">{{ t('start_camera') }}</button>
+        <button id="switch-camera" class="{{ buttonClasses }} {{ secondaryButtonClasses }}" disabled>{{ t('switch_camera') }}</button>
+        <button id="capture" class="{{ buttonClasses }} {{ saveButtonClasses }} col-span-full" disabled>{{ t('capture') }}</button>
     </div>
 
-    <p id="status" class="my-4" role="status" aria-live="polite"></p>
+    <section id="share-result" class="my-4 rounded-lg border border-zinc-200 p-4" aria-labelledby="share-title" hidden>
+        <h2 id="share-title" class="mb-2 text-lg font-bold">{{ t('share_title') }}</h2>
+        <p class="my-2 text-base">{{ t('share_instructions') }}</p>
+        <label for="result-url" class="mb-1 block font-medium">{{ t('share_link') }}</label>
+        <input id="result-url" type="url" readonly class="mb-3 w-full min-w-0 rounded-lg border border-zinc-300 p-3">
+        <div class="flex flex-wrap items-center gap-3">
+            <button id="copy-link" type="button" class="{{ buttonClasses }} {{ primaryButtonClasses }}">{{ t('copy_link') }}</button>
+            <a id="view-result" class="{{ buttonClasses }} {{ secondaryButtonClasses }} inline-flex items-center justify-center no-underline hover:bg-blue-100 active:bg-blue-200" target="_blank" rel="noopener noreferrer">{{ t('view_result') }}</a>
+        </div>
+        <p id="copy-status" class="status-label mt-3" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+    </section>
+    <p id="status" class="status-label my-4" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+    <aside class="mb-6 mt-4 rounded-xl border border-zinc-200 p-4" aria-labelledby="capture-privacy">
+        <h2 id="capture-privacy" class="mb-3 text-sm font-semibold text-zinc-900">{{ t('capture_privacy_title') }}</h2>
+        <dl class="space-y-3 text-sm leading-relaxed">
+            <div>
+                <dt class="font-medium text-zinc-800">{{ t('capture_data_title') }}</dt>
+                <dd class="mt-0.5 text-zinc-600">{{ t('capture_data_description') }}</dd>
+            </div>
+            <div class="border-t border-zinc-200 pt-3">
+                <dt class="font-medium text-zinc-800">{{ t('capture_access_title') }}</dt>
+                <dd class="mt-0.5 text-zinc-600">{{ t('capture_access_description') }}</dd>
+            </div>
+        </dl>
+    </aside>
 {% endblock %}
 
 {% block scripts %}

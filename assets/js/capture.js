@@ -3,6 +3,8 @@ import { Camera } from './camera.js';
 import { getLocation } from './location.js';
 import { VerificationApi } from './verification-api.js';
 import { takePhoto, drawPreview } from './photo.js';
+import { ResultLink } from './result-link.js';
+import { StatusLabel } from './status-label.js';
 
 const { messages, endpoint } = JSON.parse(document.querySelector('#capture-config').textContent);
 function t(key, parameters = {}) {
@@ -12,10 +14,19 @@ function t(key, parameters = {}) {
 
 const video = document.querySelector('#video');
 const canvas = document.querySelector('#canvas');
-const status = document.querySelector('#status');
+const status = new StatusLabel(document.querySelector('#status'));
 const start = document.querySelector('#start');
+const captureGuide = document.querySelector('#capture-guide-section');
 const capture = document.querySelector('#capture');
 const switchCamera = document.querySelector('#switch-camera');
+const resultLink = new ResultLink(
+    document.querySelector('#share-result'),
+    document.querySelector('#result-url'),
+    document.querySelector('#view-result'),
+    document.querySelector('#copy-status'),
+    messages,
+);
+document.querySelector('#copy-link').addEventListener('click', () => resultLink.copy());
 const camera = new Camera(video);
 const api = new VerificationApi(endpoint, t('save_failed'));
 
@@ -30,17 +41,25 @@ async function openCamera(mode = camera.facingMode, exact = false) {
     try {
         await camera.open(mode, exact);
         canvas.hidden = true;
+        resultLink.hide();
         switchCamera.textContent = t(camera.facingMode === 'user' ? 'rear_camera' : 'front_camera');
-        status.textContent = t('camera_ready');
+        status.show(t('camera_ready'), 'success');
     } catch (error) {
-        status.textContent = t('camera_unavailable', { message: error.message });
+        status.show(t('camera_unavailable', { message: error.message }), 'error');
         throw error;
     } finally {
         setBusy(false);
     }
 }
 
-start.addEventListener('click', () => openCamera().catch(() => {}));
+start.addEventListener('click', async () => {
+    captureGuide.hidden = true;
+    try {
+        await openCamera();
+    } catch {
+        captureGuide.hidden = false;
+    }
+});
 switchCamera.addEventListener('click', async () => {
     const previousMode = camera.facingMode;
     try {
@@ -48,27 +67,28 @@ switchCamera.addEventListener('click', async () => {
     } catch {
         try {
             await openCamera(previousMode);
-            status.textContent = t('camera_restored');
+            status.show(t('camera_restored'), 'warning');
         } catch { /* openCamera displays the error. */ }
     }
 });
 
 capture.addEventListener('click', async () => {
     setBusy(true);
-    status.textContent = t('requesting_location');
+    status.show(t('requesting_location'));
     try {
         const session = await api.issueSession();
         const position = await getLocation();
         const photo = takePhoto(video, t('camera_not_ready'));
-        status.textContent = t('saving_photo');
-        await api.save(session, photo, position);
+        status.show(t('saving_photo'));
+        const saved = await api.save(session, photo, position);
+        resultLink.show(saved.url, window.location.href);
         drawPreview(canvas, photo);
         video.hidden = true;
         canvas.hidden = false;
         camera.stop();
-        status.textContent = t('photo_saved');
+        status.show(t('photo_saved'), 'success');
     } catch (error) {
-        status.textContent = t('error', { message: error.message });
+        status.show(t('error', { message: error.message }), 'error');
     } finally {
         setBusy(false);
     }

@@ -16,10 +16,12 @@ $expect = static function (bool $condition, string $message): void {
 
 $renderer = new TemplateRenderer(dirname(__DIR__) . '/templates', $translator);
 $context = [
-    'assets' => ['devClient' => null, 'stylesheet' => '/build/app-test.css', 'capture' => '/build/capture-test.js'],
+    'assets' => ['devClient' => null, 'stylesheet' => '/build/app-test.css', 'capture' => '/build/capture-test.js',
+        'verify' => '/build/verify-test.js'],
     'locale' => $translator->locale(),
     'messages' => $translator->messages() + ['test_payload' => '</script><script>alert(1)</script>'],
     'captureUrl' => '/?lang=en',
+    'mapTileUrl' => 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     'record' => null,
     'hashValid' => false,
 ];
@@ -34,6 +36,7 @@ $expect(str_contains($capture, '\\u003C'), 'JSON escaped script payload');
 $missing = $renderer->render('verify.html.twig', $context);
 $expect(str_contains($missing, $translator->translate('not_found')), 'Missing record message');
 $expect(!str_contains($missing, '<script>') && !str_contains($missing, 'id="video"'), 'Verify excludes capture UI');
+$expect(!str_contains($missing, 'id="location-map"'), 'No map without a record');
 $expect(str_contains($missing, 'href="/?lang=en"'), 'Capture link');
 
 $context['record'] = [
@@ -44,6 +47,9 @@ $context['record'] = [
 ];
 $context['hashValid'] = true;
 $valid = $renderer->render('verify.html.twig', $context);
+$expect(str_contains($valid, 'id="location-map"'), 'Recorded location map');
+$expect(str_contains($valid, 'src="/build/verify-test.js"'), 'Verification map module');
+$expect(str_contains($valid, 'data-accuracy="12"'), 'Recorded accuracy passed to map');
 $expect(str_contains($valid, 'data:image/jpeg;base64,test-image'), 'Verified photo');
 $expect(str_contains($valid, '&lt;script&gt;') && !str_contains($valid, '<script>'), 'Record HTML escaping');
 $context['hashValid'] = false;

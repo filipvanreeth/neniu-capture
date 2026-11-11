@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => {
             outDir: 'public/build',
             manifest: true,
             rollupOptions: {
-                input: ['assets/css/app.css', 'assets/js/capture.js'],
+                input: ['assets/css/app.css', 'assets/js/capture.js', 'assets/js/verify.js'],
             },
         },
     };

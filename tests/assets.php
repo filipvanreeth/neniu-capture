@@ -21,6 +21,7 @@ try {
     file_put_contents($directory . '/.vite/manifest.json', json_encode([
         'assets/css/app.css' => ['file' => 'assets/app-hash.css'],
         'assets/js/capture.js' => ['file' => 'assets/capture-hash.js'],
+        'assets/js/verify.js' => ['file' => 'assets/verify-hash.js'],
     ], JSON_THROW_ON_ERROR));
     $capture = $assets->forPage(true);
     if (
@@ -38,6 +39,10 @@ try {
         || $dev['capture'] !== 'http://localhost:5173/assets/js/capture.js'
     ) {
         throw new RuntimeException('Development asset URLs');
+    }
+    $verify = $assets->forPage(false, true);
+    if ($verify['verify'] !== '/app/build/assets/verify-hash.js' || $verify['capture'] !== null) {
+        throw new RuntimeException('Verification map entry must load independently from capture');
     }
     echo "Asset tests passed\n";
 } finally {

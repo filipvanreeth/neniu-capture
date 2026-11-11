@@ -13,9 +13,8 @@ export class Camera {
                 audio: false,
             });
             this.video.srcObject = this.stream;
-            this.video.hidden = false;
-            this.video.style.removeProperty('display');
             await this.video.play();
+            this.video.hidden = false;
             this.facingMode = this.stream.getVideoTracks()[0].getSettings().facingMode || requestedMode;
         } catch (error) {
             this.stop();
@@ -27,5 +26,6 @@ export class Camera {
         this.stream?.getTracks().forEach(track => track.stop());
         this.stream = null;
         this.video.srcObject = null;
+        this.video.hidden = true;
     }
 }
