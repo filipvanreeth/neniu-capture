@@ -1,4 +1,12 @@
-# Neniu Verify
+# Neniu Capture
+
+Applicatienaam: **Neniu Capture**. Het beoogde productiesubdomein is
+`capture.neniu.help`; configureer DNS, HTTPS en de document root (`public/`)
+in de hostingomgeving. Dit stelt de applicatie zelf niet in.
+
+De PHP-namespace is `Neniu\Capture`, de Composer-package `neniu/capture` en
+de npm-package `neniu-capture`. Bestaande `/verify/{code}`-routes en het
+SQLite-bestand `storage/verify.sqlite` blijven behouden.
 
 Foto- en locatieverificatie met PHP en SQLite.
 
@@ -26,7 +34,7 @@ lando start
 lando lint
 ```
 
-Open https://neniu-verify.lndo.site en vertrouw het lokale Lando-certificaat
+Open https://neniu-capture.lndo.site en vertrouw het lokale Lando-certificaat
 zodat de browser camera- en locatietoegang toestaat.
 Composer wordt tijdens de build automatisch uitgevoerd en controleert ook
 of de SQLite-extensie beschikbaar is. SQLite gebruikt de bestaande map
@@ -78,7 +86,7 @@ waaronder `build/.vite/manifest.json`. PHP kan het manifest wel lokaal lezen.
 Voor Nginx gebruik je bijvoorbeeld (pas het pad en de PHP-upstream aan):
 
 ```nginx
-root /srv/neniu-verify/public;
+root /srv/neniu-capture/public;
 index index.php;
 
 location ~ /\. { deny all; }
@@ -257,8 +265,8 @@ lando rebuild -y
 lando npm run dev
 ```
 
-Laat het tweede commando draaien en open `https://neniu-verify.lndo.site`.
-De assets en HMR-WebSocket lopen via `https://vite-neniu-verify.lndo.site`;
+Laat het tweede commando draaien en open `https://neniu-capture.lndo.site`.
+De assets en HMR-WebSocket lopen via `https://vite-neniu-capture.lndo.site`;
 vertrouw de Lando-CA zodat de browser beide HTTPS-hosts accepteert. De proxy
 gebruikt de interne poort 5173; de browser gebruikt de normale HTTPS-poort 443.
 Vite luistert binnen de container via HTTP op `0.0.0.0:5173`. De Lando-proxy
@@ -286,7 +294,7 @@ Voor development met Vite gebruik je:
 
 ```dotenv
 APP_ENV=development
-VITE_DEV_SERVER=https://vite-neniu-verify.lndo.site
+VITE_DEV_SERVER=https://vite-neniu-capture.lndo.site
 ```
 
 Laat daarbij `lando npm run dev` draaien. Voor een productiepreview gebruik je:

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Neniu\Verify\Database;
-use Neniu\Verify\RecordRepository;
-use Neniu\Verify\VerificationService;
-use Neniu\Verify\Clock;
-use Neniu\Verify\ClientIpResolver;
+use Neniu\Capture\Database;
+use Neniu\Capture\RecordRepository;
+use Neniu\Capture\VerificationService;
+use Neniu\Capture\Clock;
+use Neniu\Capture\ClientIpResolver;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 $clock = new Clock();

@@ -1,5 +1,5 @@
 {
-    "name": "neniu/verify",
+    "name": "neniu/capture",
     "description": "Foto- en locatieverificatie met SQLite-opslag.",
     "type": "project",
     "license": "proprietary",
@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Neniu\\Verify\\": "src/"
+            "Neniu\\Capture\\": "src/"
         }
     },
     "scripts": {

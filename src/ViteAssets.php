@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Neniu\Verify;
+namespace Neniu\Capture;
 
 use RuntimeException;
 

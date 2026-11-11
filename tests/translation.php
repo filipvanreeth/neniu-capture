@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Neniu\Verify\Translator;
+use Neniu\Capture\Translator;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 

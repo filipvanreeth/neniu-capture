@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 return [
-    'page_title' => 'Neniu Verification — Photo and location record',
-    'app_name' => 'Neniu Verification',
+    'page_title' => 'Neniu Capture — Photo and location record',
+    'app_name' => 'Neniu Capture',
     'intro' => 'Capture a photo with your current location and save them together in a record you can'
         . ' review and share.',
     'not_found' => 'No record was found for this verification code. Please check the link and try again.',

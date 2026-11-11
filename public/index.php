@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use Neniu\Verify\Application;
+use Neniu\Capture\Application;
 use Dotenv\Dotenv;
-use Neniu\Verify\ClientIpResolver;
-use Neniu\Verify\Clock;
-use Neniu\Verify\Router;
-use Neniu\Verify\TemplateRenderer;
-use Neniu\Verify\ViteAssets;
-use Neniu\Verify\Translator;
+use Neniu\Capture\ClientIpResolver;
+use Neniu\Capture\Clock;
+use Neniu\Capture\Router;
+use Neniu\Capture\TemplateRenderer;
+use Neniu\Capture\ViteAssets;
+use Neniu\Capture\Translator;
 
 $projectRoot = dirname(__DIR__);
 require_once $projectRoot . '/vendor/autoload.php';

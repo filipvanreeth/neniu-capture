@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Neniu\Verify\ViteAssets;
+use Neniu\Capture\ViteAssets;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 

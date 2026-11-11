@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="Neniu Verify">
+<ruleset name="Neniu Capture">
     <description>PSR-12 for application code, translations and tests.</description>
 
     <file>public/index.php</file>

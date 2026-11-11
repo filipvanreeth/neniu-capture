@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use FastRoute\Dispatcher;
-use Neniu\Verify\Router;
+use Neniu\Capture\Router;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 

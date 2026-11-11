@@ -1,4 +1,4 @@
-name: neniu-verify
+name: neniu-capture
 
 services:
   appserver:
@@ -23,16 +23,16 @@ services:
       environment:
         npm_config_cache: /app/.lando/npm-cache
         VITE_HOST: 0.0.0.0
-        VITE_DEV_ORIGIN: https://vite-neniu-verify.lndo.site
-        VITE_BACKEND_ORIGIN: https://neniu-verify.lndo.site
+        VITE_DEV_ORIGIN: https://vite-neniu-capture.lndo.site
+        VITE_BACKEND_ORIGIN: https://neniu-capture.lndo.site
     build:
       - npm ci --prefer-offline --no-audit --no-fund --loglevel=info --fetch-timeout=30000 --fetch-retries=1
 
 proxy:
   appserver:
-    - neniu-verify.lndo.site
+    - neniu-capture.lndo.site
   node:
-    - vite-neniu-verify.lndo.site:5173
+    - vite-neniu-capture.lndo.site:5173
 
 tooling:
   node:

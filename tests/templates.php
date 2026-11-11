@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Neniu\Verify\TemplateRenderer;
-use Neniu\Verify\Translator;
+use Neniu\Capture\TemplateRenderer;
+use Neniu\Capture\Translator;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 $translator = new Translator(dirname(__DIR__) . '/translations');
