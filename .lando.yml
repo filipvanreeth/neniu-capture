@@ -1,0 +1,27 @@
+name: neniu-verify
+
+services:
+  appserver:
+    type: php:8.3
+    via: apache:2.4
+    webroot: .
+    ssl: true
+    composer_version: '2'
+    config:
+      php: .lando/php.ini
+    build:
+      - composer install --no-interaction
+      - composer check-platform-reqs
+
+proxy:
+  appserver:
+    - neniu-verify.lndo.site
+
+tooling:
+  php:
+    service: appserver
+  composer:
+    service: appserver
+  lint:
+    service: appserver
+    cmd: composer lint

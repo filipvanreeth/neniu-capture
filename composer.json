@@ -1,0 +1,30 @@
+{
+    "name": "neniu/verify",
+    "description": "Foto- en locatieverificatie met SQLite-opslag.",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.1",
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "files": [
+            "storage.php"
+        ]
+    },
+    "scripts": {
+        "lint": [
+            "@php -l index.php",
+            "@php -l i18n.php",
+            "@php -l translations/en.php",
+            "@php -l storage.php"
+        ],
+        "test": "@php tests/verification.php"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {}
+    }
+}

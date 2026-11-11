@@ -1,0 +1,4 @@
+/vendor/
+/storage/*
+!/storage/.htaccess
+.DS_Store
