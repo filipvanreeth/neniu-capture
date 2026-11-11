@@ -20,8 +20,8 @@ try {
         'assets/js/capture.js' => ['file' => 'assets/capture-hash.js'],
     ], JSON_THROW_ON_ERROR));
     $capture = $assets->forPage(true);
-    if ($capture['stylesheet'] !== '/app/public/build/assets/app-hash.css'
-        || $capture['capture'] !== '/app/public/build/assets/capture-hash.js'
+    if ($capture['stylesheet'] !== '/app/build/assets/app-hash.css'
+        || $capture['capture'] !== '/app/build/assets/capture-hash.js'
         || $capture['devClient'] !== null
         || $assets->forPage(false)['capture'] !== null) {
         throw new RuntimeException('Production asset URLs or page isolation');

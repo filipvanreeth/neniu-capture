@@ -8,14 +8,15 @@ use Neniu\Verify\Router;
 use Neniu\Verify\TemplateRenderer;
 use Neniu\Verify\ViteAssets;
 
-require_once __DIR__ . '/vendor/autoload.php';
-require_once __DIR__ . '/i18n.php';
+$projectRoot = dirname(__DIR__);
+require_once $projectRoot . '/vendor/autoload.php';
+require_once $projectRoot . '/i18n.php';
 header('Content-Language: ' . $locale);
 
 $basePath = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/.');
 $router = new Router($basePath);
 $application = new Application(
-    __DIR__ . '/storage',
+    $projectRoot . '/storage',
     $locale,
     new Clock(),
     new ClientIpResolver(array_values(array_filter(array_map(
@@ -24,8 +25,8 @@ $application = new Application(
     $router,
 );
 $view = $application->handle();
-$renderer = new TemplateRenderer(__DIR__ . '/templates');
-$assets = new ViteAssets(__DIR__ . '/public/build', $basePath, getenv('VITE_DEV_SERVER') ?: null);
+$renderer = new TemplateRenderer($projectRoot . '/templates');
+$assets = new ViteAssets(__DIR__ . '/build', $basePath, getenv('VITE_DEV_SERVER') ?: null);
 echo $renderer->render($view['isVerification'] ? 'verify.html.twig' : 'capture.html.twig', [
     'assets' => $assets->forPage(!$view['isVerification']),
     'locale' => $locale,

@@ -18,7 +18,7 @@
     },
     "scripts": {
         "lint": [
-            "@php -l index.php",
+            "@php -l public/index.php",
             "@php -l i18n.php",
             "@php -l translations/en.php",
             "find src tests -name \"*.php\" -exec php -l {} \\;",

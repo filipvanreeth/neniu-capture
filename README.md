@@ -65,11 +65,35 @@ composer install --no-dev --optimize-autoloader
 composer check-platform-reqs
 ```
 
-Gebruik HTTPS voor camera- en locatietoegang. Op Apache moet `.htaccess`
-ingeschakeld zijn zodat `storage/.htaccess` de opslagmap afschermt.
-Configureer bij andere webservers een overeenkomstige blokkering voor
-`/storage/` en `/vendor/`. De ingebouwde PHP-webserver is alleen bedoeld
-voor lokale ontwikkeling en past `.htaccess` niet toe.
+Gebruik HTTPS voor camera- en locatietoegang. Stel de document root van de
+webserver uitsluitend in op de absolute map `public/`, nooit op de projectroot.
+Alleen `public/index.php`, `public/.htaccess` en de gebouwde frontendbestanden
+staan binnen de webroot. Opslag, configuratie, templates en afhankelijkheden
+blijven daarbuiten. De `.htaccess` in de projectroot weigert toegang bij een
+onjuiste document root; `storage/.htaccess` blijft een extra beveiliging.
+
+Apache moet `mod_rewrite` en de regels in `public/.htaccess` toestaan.
+De publieke configuratie schakelt directorylisting uit en blokkeert dotfiles,
+waaronder `build/.vite/manifest.json`. PHP kan het manifest wel lokaal lezen.
+Voor Nginx gebruik je bijvoorbeeld (pas het pad en de PHP-upstream aan):
+
+```nginx
+root /srv/neniu-verify/public;
+index index.php;
+
+location ~ /\. { deny all; }
+location / { try_files $uri $uri/ /index.php?$query_string; }
+location = /index.php {
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+    fastcgi_pass unix:/run/php/php-fpm.sock;
+}
+location ~ \.php$ { return 404; }
+```
+
+De ingebouwde PHP-webserver is alleen bedoeld voor lokale ontwikkeling.
+Start deze met `php -S localhost:8000 -t public dev-router.php`; de ontwikkelrouter
+geeft uitsluitend gebouwde assets rechtstreeks vrij.
 
 Commit `composer.json` en `composer.lock`; upload bij deployment ook de
 gegenereerde `vendor/`-map of voer Composer op de server uit.
@@ -134,7 +158,7 @@ metadatabehoud, proxyvertrouwen, timestamps, eenmalig gebruik, verval en rollbac
 
 ## Codestructuur
 
-- `index.php`: maakt de applicatie aan en laat Twig de juiste pagina renderen.
+- `public/index.php`: maakt de applicatie aan en laat Twig de juiste pagina renderen.
 - `src/Application.php`: verwerkt upload-, sessie- en verificatieverzoeken.
 - `src/Database.php`: maakt de SQLite-verbinding en voert schemamigraties uit.
 - `src/RecordRepository.php`: bewaart en leest records, inclusief JSON-import.
@@ -159,9 +183,9 @@ De taal blijft in `?lang=en` staan. Verificatie verloopt uitsluitend via
 onjuiste methodes HTTP 405 met een `Allow`-header.
 
 Apache moet `mod_rewrite` en `.htaccess`-regels toestaan. De rootconfiguratie
-stuurt niet-bestaande paden naar `index.php`. Configureer bij Nginx een
+in `public/.htaccess` stuurt niet-bestaande paden naar `public/index.php`. Configureer bij Nginx een
 vergelijkbare front-controllerregel en behoud de blokkering van opslag en vendor.
-Lokaal kan de applicatie worden gestart met `php -S localhost:8000 dev-router.php`.
+Lokaal kan de applicatie worden gestart met `php -S localhost:8000 -t public dev-router.php`.
 
 
 ## Twig-templates
@@ -215,7 +239,7 @@ VITE_BACKEND_ORIGIN=http://localhost:8000 npm run dev
 Start de PHP-server in een tweede terminal:
 
 ```sh
-VITE_DEV_SERVER=http://localhost:5173 php -S localhost:8000 dev-router.php
+VITE_DEV_SERVER=http://localhost:5173 php -S localhost:8000 -t public dev-router.php
 ```
 
 Open `http://localhost:8000`. `VITE_DEV_SERVER` moet in de omgeving van PHP staan;
@@ -272,7 +296,7 @@ origins als de PHP-asset-URL aan.
 
 Voer in de buildomgeving `npm ci` en `npm run build` uit. Publiceer de volledige
 map `public/build/`, inclusief `.vite/manifest.json`, samen met PHP, templates en
-Composer-afhankelijkheden. De projectroot blijft de webroot. Laat
+Composer-afhankelijkheden. De document root moet naar `public/` wijzen; houd de overige projectmappen erbuiten. Laat
 `VITE_DEV_SERVER` op productie weg. Node.js is op de productieserver niet nodig.
 `node_modules/` en de gegenereerde build worden niet in Git opgenomen;
 `package-lock.json` wel. Behoud het bestaande SQLite-bestand bij deployment.

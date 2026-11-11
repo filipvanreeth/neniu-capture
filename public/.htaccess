@@ -1,0 +1,10 @@
+Require all granted
+Options -Indexes
+DirectoryIndex index.php
+
+RewriteEngine On
+# Keep dotfiles and Vite's manifest private.
+RewriteRule (^|/)\. - [F,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]

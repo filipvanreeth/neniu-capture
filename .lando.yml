@@ -4,7 +4,7 @@ services:
   appserver:
     type: php:8.3
     via: apache:2.4
-    webroot: .
+    webroot: public
     ssl: true
     composer_version: '2'
     overrides:

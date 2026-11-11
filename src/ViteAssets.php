@@ -33,7 +33,7 @@ final class ViteAssets
             if (!isset($manifest[$entry]['file'])) {
                 throw new RuntimeException('Missing Vite manifest entry: ' . $entry);
             }
-            return $this->basePath . '/public/build/' . $manifest[$entry]['file'];
+            return $this->basePath . '/build/' . $manifest[$entry]['file'];
         };
         return [
             'devClient' => null,
