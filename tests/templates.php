@@ -2,9 +2,10 @@
 declare(strict_types=1);
 
 use Neniu\Verify\TemplateRenderer;
+use Neniu\Verify\Translator;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
-require dirname(__DIR__) . '/i18n.php';
+$translator = new Translator(dirname(__DIR__) . '/translations');
 
 function expect(bool $condition, string $message): void
 {
@@ -13,11 +14,11 @@ function expect(bool $condition, string $message): void
     }
 }
 
-$renderer = new TemplateRenderer(dirname(__DIR__) . '/templates');
+$renderer = new TemplateRenderer(dirname(__DIR__) . '/templates', $translator);
 $context = [
     'assets' => ['devClient' => null, 'stylesheet' => '/build/app-test.css', 'capture' => '/build/capture-test.js'],
-    'locale' => $locale,
-    'messages' => $messages + ['test_payload' => '</script><script>alert(1)</script>'],
+    'locale' => $translator->locale(),
+    'messages' => $translator->messages() + ['test_payload' => '</script><script>alert(1)</script>'],
     'captureUrl' => '/?lang=en',
     'record' => null,
     'hashValid' => false,
@@ -31,7 +32,7 @@ expect(substr_count($capture, '</script>') === 2, 'Only JSON and module script t
 expect(str_contains($capture, '\\u003C'), 'JSON escaped script payload');
 
 $missing = $renderer->render('verify.html.twig', $context);
-expect(str_contains($missing, t('not_found')), 'Missing record message');
+expect(str_contains($missing, $translator->translate('not_found')), 'Missing record message');
 expect(!str_contains($missing, '<script>') && !str_contains($missing, 'id="video"'), 'Verify excludes capture UI');
 expect(str_contains($missing, 'href="/?lang=en"'), 'Capture link');
 
@@ -47,5 +48,5 @@ expect(str_contains($valid, 'data:image/jpeg;base64,test-image'), 'Verified phot
 expect(str_contains($valid, '&lt;script&gt;') && !str_contains($valid, '<script>'), 'Record HTML escaping');
 $context['hashValid'] = false;
 $invalid = $renderer->render('verify.html.twig', $context);
-expect(!str_contains($invalid, '<img') && str_contains($invalid, t('invalid')), 'Invalid photo hidden');
+expect(!str_contains($invalid, '<img') && str_contains($invalid, $translator->translate('invalid')), 'Invalid photo hidden');
 echo "Template tests passed\n";

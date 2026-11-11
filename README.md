@@ -7,10 +7,10 @@ Foto- en locatieverificatie met PHP en SQLite.
 Engels is de standaardtaal. Alle applicatieteksten staan in
 `translations/en.php` en worden door PHP en JavaScript gedeeld.
 Voeg voor een extra taal bijvoorbeeld `translations/nl.php` toe met dezelfde
-sleutels en registreer `nl` in `$supportedLocales` in `i18n.php`.
+sleutels en geef `['en', 'nl']` als ondersteunde talen mee aan de `Translator` in `public/index.php`.
 Open vervolgens `?lang=nl`; verificatielinks en uploads behouden deze taal.
 Ontbrekende vertalingen en onbekende talen vallen terug op Engels.
-Gebruik `{message}` voor variabele tekst en `t('sleutel', ['message' => $waarde])`
+Gebruik `{message}` voor variabele tekst en `$translator->translate('sleutel', ['message' => $waarde])`
 in PHP of `t('sleutel', { message: waarde })` in JavaScript.
 Gebruik in Twig `{{ t('sleutel') }}`; HTML wordt automatisch geëscapet.
 Browsermeldingen zoals geweigerde cameratoegang kunnen de browsertaal volgen.
@@ -197,7 +197,7 @@ variabelen. De pagina's zijn opgesplitst in:
 - `templates/capture.html.twig`: opnamepagina en camerabediening.
 - `templates/verify.html.twig`: verificatieresultaat of melding bij ontbrekend record.
 
-De Twig-functie `t()` gebruikt dezelfde vertalingen als PHP. `json_script()`
+De Twig-functie `t()` gebruikt hetzelfde `Translator`-object als de applicatie. `json_script()`
 serialiseert waarden veilig voor het JSON-configuratieblok van de capturepagina.
 `composer test` controleert ook de templates en escaping.
 
@@ -319,3 +319,12 @@ De bestaande commando's blijven gelijk: `lando npm run dev` voor ontwikkeling
 en `lando npm run build` voor productie. Tailwind genereert alleen CSS en voegt
 geen JavaScript-runtime toe. De geïnstalleerde versies staan vastgelegd in
 `package-lock.json`.
+
+
+## Vertaalobject
+
+`src/Translator.php` beheert de taalkeuze, Engelse fallback, vertaalberichten en
+parametervervanging zonder globale variabelen of PHP-helperfuncties. Het object
+wordt in `public/index.php` aangemaakt en geïnjecteerd in `Application` en
+`TemplateRenderer`. Twig blijft `t()` gebruiken; JavaScript ontvangt een kopie
+van de berichten via het JSON-configuratieblok.

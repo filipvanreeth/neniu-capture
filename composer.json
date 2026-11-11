@@ -19,7 +19,6 @@
     "scripts": {
         "lint": [
             "@php -l public/index.php",
-            "@php -l i18n.php",
             "@php -l translations/en.php",
             "find src tests -name \"*.php\" -exec php -l {} \\;",
             "@php -l dev-router.php"
@@ -28,7 +27,8 @@
             "@php tests/verification.php",
             "@php tests/routing.php",
             "@php tests/templates.php",
-            "@php tests/assets.php"
+            "@php tests/assets.php",
+            "@php tests/translation.php"
         ]
     },
     "config": {

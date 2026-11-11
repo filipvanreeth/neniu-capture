@@ -12,7 +12,7 @@ final class Application
 
     public function __construct(
         private string $storage,
-        private string $locale,
+        private Translator $translator,
         private Clock $clock,
         private ClientIpResolver $ipResolver,
         private Router $router,
@@ -23,13 +23,13 @@ final class Application
     {
         $route = $this->router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
         if ($route[0] === Dispatcher::NOT_FOUND) {
-            $this->respond(['error' => t('route_not_found')], 404);
+            $this->respond(['error' => $this->translator->translate('route_not_found')], 404);
         }
         if ($route[0] === Dispatcher::METHOD_NOT_ALLOWED) {
             header('Allow: ' . implode(', ', $route[1]));
-            $this->respond(['error' => t('method_not_allowed')], 405);
+            $this->respond(['error' => $this->translator->translate('method_not_allowed')], 405);
         }
-        $locale = $this->locale;
+        $locale = $this->translator->locale();
         $receivedAt = $this->clock->now();
         $requestId = bin2hex(random_bytes(16));
 
@@ -39,7 +39,7 @@ final class Application
             $verification = new VerificationService($db, $records, $this->clock);
         } catch (Throwable $error) {
             error_log('Database initialization failed: ' . $error->getMessage());
-            $this->respond(['error' => t('storage_unavailable')], 500);
+            $this->respond(['error' => $this->translator->translate('storage_unavailable')], 500);
         }
 
         // Upload endpoint
@@ -49,29 +49,29 @@ final class Application
                     $this->respond($verification->issue());
                 } catch (Throwable $error) {
                     error_log('Session creation failed: ' . $error->getMessage());
-                    $this->respond(['error' => t('storage_unavailable')], 500);
+                    $this->respond(['error' => $this->translator->translate('storage_unavailable')], 500);
                 }
             }
             if (($_POST['action'] ?? '') !== 'save') {
-                $this->respond(['error' => t('invalid_action')], 400);
+                $this->respond(['error' => $this->translator->translate('invalid_action')], 400);
             }
 
             if ((int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > 8_000_000) {
-                $this->respond(['error' => t('upload_too_large')], 413);
+                $this->respond(['error' => $this->translator->translate('upload_too_large')], 413);
             }
 
             $token = $_POST['session_token'] ?? '';
             if (!is_string($token) || !preg_match('/^[a-f0-9]{64}$/D', $token)) {
-                $this->respond(['error' => t('invalid_session')], 409);
+                $this->respond(['error' => $this->translator->translate('invalid_session')], 409);
             }
             $capturedAt = $this->clock->fromBrowserTimestamp($_POST['captured_at'] ?? null);
             $locationAt = $this->clock->fromBrowserTimestamp($_POST['location_timestamp'] ?? null);
             if ($capturedAt === null || $locationAt === null) {
-                $this->respond(['error' => t('invalid_timestamps')], 400);
+                $this->respond(['error' => $this->translator->translate('invalid_timestamps')], 400);
             }
             $dataUrl = $_POST['image'] ?? '';
             if (!is_string($dataUrl)) {
-                $this->respond(['error' => t('invalid_image')], 400);
+                $this->respond(['error' => $this->translator->translate('invalid_image')], 400);
             }
             if (
                 !preg_match(
@@ -80,7 +80,7 @@ final class Application
                     $matches
                 )
             ) {
-                $this->respond(['error' => t('invalid_image')], 400);
+                $this->respond(['error' => $this->translator->translate('invalid_image')], 400);
             }
 
             $bytes = base64_decode($matches[1], true);
@@ -90,7 +90,7 @@ final class Application
                 $bytes === false || strlen($bytes) > 5_000_000 ||
                 !$imageInfo || $imageInfo[2] !== IMAGETYPE_JPEG
             ) {
-                $this->respond(['error' => t('invalid_image_data')], 400);
+                $this->respond(['error' => $this->translator->translate('invalid_image_data')], 400);
             }
 
             $lat = filter_var($_POST['lat'] ?? null, FILTER_VALIDATE_FLOAT);
@@ -103,7 +103,7 @@ final class Application
                 $lon < -180 || $lon > 180 ||
                 $accuracy === false || !is_finite($accuracy) || $accuracy < 0
             ) {
-                $this->respond(['error' => t('invalid_gps')], 400);
+                $this->respond(['error' => $this->translator->translate('invalid_gps')], 400);
             }
 
             $code = bin2hex(random_bytes(16));
@@ -147,11 +147,11 @@ final class Application
 
             try {
                 if (!$verification->save($record, $bytes, $token)) {
-                    $this->respond(['error' => t('invalid_session')], 409);
+                    $this->respond(['error' => $this->translator->translate('invalid_session')], 409);
                 }
             } catch (Throwable $error) {
                 error_log('Record storage failed: ' . $error->getMessage());
-                $this->respond(['error' => t('storage_failed')], 500);
+                $this->respond(['error' => $this->translator->translate('storage_failed')], 500);
             }
 
             $this->respond([
@@ -172,7 +172,7 @@ final class Application
             $record = $records->find($code);
         } catch (Throwable $error) {
             error_log('Record lookup failed: ' . $error->getMessage());
-            $this->respond(['error' => t('storage_unavailable')], 500);
+            $this->respond(['error' => $this->translator->translate('storage_unavailable')], 500);
         }
         if ($record === null) {
             http_response_code(404);
