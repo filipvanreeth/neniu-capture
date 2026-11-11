@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    <p>
+        {{ t('consent_notice') }}
+    </p>
+
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas" hidden></canvas>
+
+    <div class="camera-actions">
+        <button id="start">{{ t('start_camera') }}</button>
+        <button id="switch-camera" disabled>{{ t('switch_camera') }}</button>
+        <button id="capture" disabled>{{ t('capture') }}</button>
+    </div>
+
+    <p id="status"></p>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        {% include 'capture.js.twig' %}
+    </script>
+{% endblock %}

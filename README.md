@@ -12,7 +12,7 @@ Open vervolgens `?lang=nl`; verificatielinks en uploads behouden deze taal.
 Ontbrekende vertalingen en onbekende talen vallen terug op Engels.
 Gebruik `{message}` voor variabele tekst en `t('sleutel', ['message' => $waarde])`
 in PHP of `t('sleutel', { message: waarde })` in JavaScript.
-Escape vertalingen in HTML met `e(t('sleutel'))`.
+Gebruik in Twig `{{ t('sleutel') }}`; HTML wordt automatisch geëscapet.
 Browsermeldingen zoals geweigerde cameratoegang kunnen de browsertaal volgen.
 
 ## Lokaal met Lando
@@ -134,7 +134,7 @@ metadatabehoud, proxyvertrouwen, timestamps, eenmalig gebruik, verval en rollbac
 
 ## Codestructuur
 
-- `index.php`: maakt de applicatie aan en rendert de bestaande pagina.
+- `index.php`: maakt de applicatie aan en laat Twig de juiste pagina renderen.
 - `src/Application.php`: verwerkt upload-, sessie- en verificatieverzoeken.
 - `src/Database.php`: maakt de SQLite-verbinding en voert schemamigraties uit.
 - `src/RecordRepository.php`: bewaart en leest records, inclusief JSON-import.
@@ -162,3 +162,18 @@ Apache moet `mod_rewrite` en `.htaccess`-regels toestaan. De rootconfiguratie
 stuurt niet-bestaande paden naar `index.php`. Configureer bij Nginx een
 vergelijkbare front-controllerregel en behoud de blokkering van opslag en vendor.
 Lokaal kan de applicatie worden gestart met `php -S localhost:8000 index.php`.
+
+
+## Twig-templates
+
+`src/TemplateRenderer.php` configureert Twig met HTML-autoescaping en strikte
+variabelen. De pagina's zijn opgesplitst in:
+
+- `templates/base.html.twig`: gedeelde HTML-structuur en styling.
+- `templates/capture.html.twig`: opnamepagina en camerabediening.
+- `templates/capture.js.twig`: capturescript, alleen geladen op de opnamepagina.
+- `templates/verify.html.twig`: verificatieresultaat of melding bij ontbrekend record.
+
+De Twig-functie `t()` gebruikt dezelfde vertalingen als PHP. `json_script()`
+serialiseert waarden veilig voor het inline capturescript.
+`composer test` controleert ook de templates en escaping.

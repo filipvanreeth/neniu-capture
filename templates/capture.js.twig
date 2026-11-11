@@ -1,0 +1,197 @@
+const locale = {{ json_script(locale) }};
+const messages = {{ json_script(messages) }};
+function t(key, parameters = {}) {
+    return (messages[key] ?? key).replace(/\{(\w+)\}/g,
+        (placeholder, name) => Object.hasOwn(parameters, name) ? String(parameters[name]) : placeholder);
+}
+
+const video = document.querySelector('#video');
+const canvas = document.querySelector('#canvas');
+const status = document.querySelector('#status');
+const start = document.querySelector('#start');
+const capture = document.querySelector('#capture');
+const switchCamera = document.querySelector('#switch-camera');
+
+let stream = null;
+let facingMode = 'user';
+
+async function openCamera(requestedMode, exact = false) {
+    start.disabled = true;
+    capture.disabled = true;
+    switchCamera.disabled = true;
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+    }
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: exact ? { exact: requestedMode } : { ideal: requestedMode } },
+            audio: false
+        });
+        video.srcObject = stream;
+        video.hidden = false;
+        video.style.removeProperty('display');
+        await video.play();
+        canvas.hidden = true;
+        facingMode = stream.getVideoTracks()[0].getSettings().facingMode || requestedMode;
+        capture.disabled = false;
+        switchCamera.disabled = false;
+        switchCamera.textContent = facingMode === 'user'
+            ? t('rear_camera') : t('front_camera');
+        status.textContent = t('camera_ready');
+    } catch (error) {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        status.textContent = t('camera_unavailable', { message: error.message });
+        throw error;
+    } finally {
+        start.disabled = false;
+    }
+}
+
+start.onclick = () => openCamera(facingMode).catch(() => { });
+
+switchCamera.onclick = async () => {
+    const previousMode = facingMode;
+    try {
+        await openCamera(facingMode === 'user' ? 'environment' : 'user', true);
+    } catch (error) {
+        // Restore the current camera if the requested camera is unavailable.
+        try {
+            await openCamera(previousMode);
+            status.textContent = t('camera_restored');
+        } catch (restoreError) {
+            // openCamera already displays the error and enables restarting.
+        }
+    }
+};
+
+function getLocation() {
+    return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+            resolve,
+            reject,
+            {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 0
+            }
+        );
+    });
+}
+
+capture.onclick = async () => {
+    capture.disabled = true;
+    start.disabled = true;
+    switchCamera.disabled = true;
+    status.textContent = t('requesting_location');
+
+    try {
+        const sessionForm = new FormData();
+        sessionForm.append('action', 'session');
+        const sessionResponse = await fetch(location.pathname + '?lang=' + encodeURIComponent(locale), {
+            method: 'POST', body: sessionForm
+        });
+        const session = await sessionResponse.json();
+        if (!sessionResponse.ok) {
+            throw new Error(session.error || t('save_failed'));
+        }
+        const position = await getLocation();
+
+        if (!video.videoWidth || !video.videoHeight) {
+            throw new Error(t('camera_not_ready'));
+        }
+
+        // Capture the original image
+        const original = document.createElement('canvas');
+        original.width = video.videoWidth;
+        original.height = video.videoHeight;
+        original.getContext('2d').drawImage(
+            video, 0, 0, original.width, original.height
+        );
+
+        const capturedAt = Date.now();
+        const image = original.toDataURL('image/jpeg', 0.85);
+
+        status.textContent = t('saving_photo');
+
+        const form = new FormData();
+        form.append('action', 'save');
+        form.append('image', image);
+        form.append('session_token', session.token);
+        form.append('captured_at', String(capturedAt));
+        form.append('location_timestamp', String(Math.trunc(position.timestamp)));
+        form.append('lat', position.coords.latitude);
+        form.append('lon', position.coords.longitude);
+        form.append('accuracy', position.coords.accuracy);
+
+        const response = await fetch(location.pathname + '?lang=' + encodeURIComponent(locale), {
+            method: 'POST',
+            body: form
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || t('save_failed'));
+        }
+
+        // Display a separate annotated preview
+        canvas.width = original.width;
+        canvas.height = original.height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(original, 0, 0);
+
+        const fontSize = Math.max(14, canvas.width / 35);
+        ctx.font = `${fontSize}px sans-serif`;
+
+        const lines = [
+            `CODE: ${data.code}`,
+            `LOCATION: ${position.coords.latitude.toFixed(5)}, ` +
+            position.coords.longitude.toFixed(5),
+            `UTC: ${new Date(capturedAt).toISOString()}`
+        ];
+
+        const lineHeight = fontSize * 1.4;
+        const boxHeight = lineHeight * lines.length + 20;
+
+        ctx.fillStyle = 'rgba(0,0,0,0.75)';
+        ctx.fillRect(
+            0,
+            canvas.height - boxHeight,
+            canvas.width,
+            boxHeight
+        );
+
+        ctx.fillStyle = 'white';
+        lines.forEach((line, index) => {
+            ctx.fillText(
+                line,
+                10,
+                canvas.height - boxHeight + 15 +
+                lineHeight * (index + 0.7)
+            );
+        });
+
+        video.hidden = true;
+        video.style.display = 'none';
+        canvas.hidden = false;
+
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        start.disabled = false;
+
+        status.textContent = t('photo_saved');
+
+    } catch (error) {
+        status.textContent = t('error', { message: error.message });
+        capture.disabled = false;
+        start.disabled = false;
+        switchCamera.disabled = false;
+    }
+};

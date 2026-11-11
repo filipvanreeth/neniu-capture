@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block content %}
+    {% if not record %}
+        <p>{{ t('not_found') }}</p>
+    {% else %}
+        <h2>{{ t('verification_result') }}</h2>
+        <p>{{ t('integrity') }}:
+            <strong>{{ t(hashValid ? 'valid' : 'invalid') }}</strong>
+        </p>
+        {% if hashValid %}
+            <img alt="{{ t('photo_alt') }}" src="data:image/jpeg;base64,{{ record.image.base64 }}">
+        {% endif %}
+        <p>{{ t('code') }}: {{ record.code }}</p>
+        <p>{{ t('timestamp') }}: {{ record.created_at }}</p>
+        <p>{{ t('gps') }}: {{ record.location.latitude }}, {{ record.location.longitude }}</p>
+        <p>{{ t('accuracy') }}: {{ record.location.accuracy_meters }} {{ t('meters') }}</p>
+        <p><small>{{ t('gps_notice') }}</small></p>
+    {% endif %}
+    <a href="{{ captureUrl }}">{{ t('new_capture') }}</a>
+{% endblock %}
