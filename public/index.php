@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use Neniu\Verify\Application;
@@ -22,7 +23,8 @@ $application = new Application(
     $translator,
     new Clock(),
     new ClientIpResolver(array_values(array_filter(array_map(
-        'trim', explode(',', getenv('TRUSTED_PROXIES') ?: '')
+        'trim',
+        explode(',', getenv('TRUSTED_PROXIES') ?: '')
     )))),
     $router,
 );

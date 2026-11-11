@@ -1,10 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Neniu\Verify;
 
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
+
 use function FastRoute\simpleDispatcher;
 
 final class Router

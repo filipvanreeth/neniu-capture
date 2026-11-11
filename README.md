@@ -328,3 +328,22 @@ parametervervanging zonder globale variabelen of PHP-helperfuncties. Het object
 wordt in `public/index.php` aangemaakt en geïnjecteerd in `Application` en
 `TemplateRenderer`. Twig blijft `t()` gebruiken; JavaScript ontvangt een kopie
 van de berichten via het JSON-configuratieblok.
+
+
+## PHP-codestijl
+
+PHP_CodeSniffer controleert PHP-code op PSR-12 met `phpcs.xml.dist`.
+PHPCBF past automatisch herstelbare stijlproblemen aan:
+
+```sh
+composer cs
+composer cs:fix
+```
+
+Binnen Lando: `lando composer cs` en `lando composer cs:fix`.
+Na een rebuild zijn ook de shortcuts `lando cs` en `lando cs-fix` beschikbaar.
+De controle omvat de frontcontroller, klassen, vertalingen, PHP-tests en lokale
+ontwikkelrouter; dependencies en gegenereerde bestanden worden niet meegenomen.
+Controleer na formatteren de resterende meldingen met `composer cs` en voer
+`composer lint` en `composer test` uit. De formatter is een ontwikkelafhankelijkheid
+en wordt bij `composer install --no-dev` niet op productie geïnstalleerd.

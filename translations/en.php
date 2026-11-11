@@ -1,10 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 return [
     'page_title' => 'Neniu Verification — Photo and location record',
     'app_name' => 'Neniu Verification',
-    'intro' => 'Capture a photo with your current location and save them together in a record you can review and share.',
+    'intro' => 'Capture a photo with your current location and save them together in a record you can'
+        . ' review and share.',
     'not_found' => 'No record was found for this verification code. Please check the link and try again.',
     'verification_result' => 'Photo and location record',
     'integrity' => 'Photo integrity check',
@@ -16,9 +18,15 @@ return [
     'gps' => 'Location coordinates',
     'accuracy' => 'Reported location accuracy',
     'meters' => 'meters',
-    'gps_notice' => 'Location coordinates and accuracy are provided by your browser and have not been independently verified. The photo integrity check compares the saved photo with its stored checksum; it does not verify identity or location.',
+    'gps_notice' => 'Location coordinates and accuracy are provided by your browser and have not been'
+        . ' independently verified. The photo integrity check compares the saved photo with its'
+        . ' stored checksum; it does not verify identity or location.',
     'new_capture' => 'Create a new record',
-    'consent_notice' => 'Select “Start camera” and allow camera access to preview your photo. Select “Take and save photo” to request your location and save the photo with its coordinates. We also store your IP address, browser information, capture and location measurement times, and technical photo details. Anyone with the verification link can view the saved photo and location.',
+    'consent_notice' => 'Select “Start camera” and allow camera access to preview your photo. Select “Take and'
+        . ' save photo” to request your location and save the photo with its coordinates. We also'
+        . ' store your IP address, browser information, capture and location measurement times,'
+        . ' and technical photo details. Anyone with the verification link can view the saved'
+        . ' photo and location.',
     'start_camera' => 'Start camera',
     'switch_camera' => 'Switch camera',
     'capture' => 'Take and save photo',
@@ -43,6 +51,7 @@ return [
     'upload_too_large' => 'The upload exceeds the allowed size.',
     'invalid_image' => 'The photo must be a valid JPEG image.',
     'invalid_image_data' => 'The photo could not be read or exceeds the allowed size.',
-    'invalid_gps' => 'Valid location coordinates and accuracy are required. Please allow location access and try again.',
+    'invalid_gps' => 'Valid location coordinates and accuracy are required. Please allow location access'
+        . ' and try again.',
     'storage_failed' => 'Your record could not be saved. Please try again.',
 ];

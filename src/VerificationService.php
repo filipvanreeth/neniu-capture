@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Neniu\Verify;
@@ -49,7 +50,8 @@ final class VerificationService
                 'expires_at' => gmdate('Y-m-d\\TH:i:s\\Z', (int) $session['expires_at']),
             ];
             $this->records->save($record, $bytes);
-            $this->db->prepare('DELETE FROM verification_sessions WHERE token_hash = ?')->execute([$session['token_hash']]);
+            $this->db->prepare('DELETE FROM verification_sessions WHERE token_hash = ?')
+                ->execute([$session['token_hash']]);
             $this->db->exec('COMMIT');
             return true;
         } catch (Throwable $error) {

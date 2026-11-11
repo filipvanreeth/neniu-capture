@@ -29,10 +29,15 @@
             "@php tests/templates.php",
             "@php tests/assets.php",
             "@php tests/translation.php"
-        ]
+        ],
+        "cs": "phpcs",
+        "cs:fix": "phpcbf"
     },
     "config": {
         "sort-packages": true,
         "allow-plugins": {}
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^4.0"
     }
 }

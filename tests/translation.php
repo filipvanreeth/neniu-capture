@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use Neniu\Verify\Translator;
@@ -12,12 +13,14 @@ try {
     file_put_contents($directory . '/nl.php', "<?php return ['greeting' => 'Dag {name}'];");
     $english = new Translator($directory);
     $dutch = new Translator($directory, 'nl', ['en', 'nl']);
-    if ($english->locale() !== 'en' || $dutch->locale() !== 'nl'
+    if (
+        $english->locale() !== 'en' || $dutch->locale() !== 'nl'
         || $dutch->translate('greeting', ['name' => 'Filip']) !== 'Dag Filip'
         || $dutch->translate('fallback') !== 'English'
         || $dutch->translate('unknown') !== 'unknown'
         || $english->translate('greeting', ['name' => 'Filip']) !== 'Hello Filip'
-        || $dutch->messages()['greeting'] !== 'Dag {name}') {
+        || $dutch->messages()['greeting'] !== 'Dag {name}'
+    ) {
         throw new RuntimeException('Translation, fallback, interpolation or instance isolation failed');
     }
     foreach (['fr', '../nl', ['nl'], null] as $invalid) {

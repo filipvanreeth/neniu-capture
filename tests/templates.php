@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use Neniu\Verify\TemplateRenderer;
@@ -7,12 +8,11 @@ use Neniu\Verify\Translator;
 require dirname(__DIR__) . '/vendor/autoload.php';
 $translator = new Translator(dirname(__DIR__) . '/translations');
 
-function expect(bool $condition, string $message): void
-{
+$expect = static function (bool $condition, string $message): void {
     if (!$condition) {
         throw new RuntimeException($message);
     }
-}
+};
 
 $renderer = new TemplateRenderer(dirname(__DIR__) . '/templates', $translator);
 $context = [
@@ -24,17 +24,17 @@ $context = [
     'hashValid' => false,
 ];
 $capture = $renderer->render('capture.html.twig', $context);
-expect(str_contains($capture, 'id="video"') && str_contains($capture, 'id="capture"'), 'Capture controls');
-expect(str_contains($capture, 'type="module" src="/build/capture-test.js"'), 'Capture module');
-expect(str_contains($capture, 'id="capture-config" type="application/json"'), 'Capture configuration');
-expect(!str_contains($capture, '</script><script>alert(1)</script>'), 'Script JSON escaping');
-expect(substr_count($capture, '</script>') === 2, 'Only JSON and module script tags');
-expect(str_contains($capture, '\\u003C'), 'JSON escaped script payload');
+$expect(str_contains($capture, 'id="video"') && str_contains($capture, 'id="capture"'), 'Capture controls');
+$expect(str_contains($capture, 'type="module" src="/build/capture-test.js"'), 'Capture module');
+$expect(str_contains($capture, 'id="capture-config" type="application/json"'), 'Capture configuration');
+$expect(!str_contains($capture, '</script><script>alert(1)</script>'), 'Script JSON escaping');
+$expect(substr_count($capture, '</script>') === 2, 'Only JSON and module script tags');
+$expect(str_contains($capture, '\\u003C'), 'JSON escaped script payload');
 
 $missing = $renderer->render('verify.html.twig', $context);
-expect(str_contains($missing, $translator->translate('not_found')), 'Missing record message');
-expect(!str_contains($missing, '<script>') && !str_contains($missing, 'id="video"'), 'Verify excludes capture UI');
-expect(str_contains($missing, 'href="/?lang=en"'), 'Capture link');
+$expect(str_contains($missing, $translator->translate('not_found')), 'Missing record message');
+$expect(!str_contains($missing, '<script>') && !str_contains($missing, 'id="video"'), 'Verify excludes capture UI');
+$expect(str_contains($missing, 'href="/?lang=en"'), 'Capture link');
 
 $context['record'] = [
     'code' => '<script>alert(1)</script>',
@@ -44,9 +44,12 @@ $context['record'] = [
 ];
 $context['hashValid'] = true;
 $valid = $renderer->render('verify.html.twig', $context);
-expect(str_contains($valid, 'data:image/jpeg;base64,test-image'), 'Verified photo');
-expect(str_contains($valid, '&lt;script&gt;') && !str_contains($valid, '<script>'), 'Record HTML escaping');
+$expect(str_contains($valid, 'data:image/jpeg;base64,test-image'), 'Verified photo');
+$expect(str_contains($valid, '&lt;script&gt;') && !str_contains($valid, '<script>'), 'Record HTML escaping');
 $context['hashValid'] = false;
 $invalid = $renderer->render('verify.html.twig', $context);
-expect(!str_contains($invalid, '<img') && str_contains($invalid, $translator->translate('invalid')), 'Invalid photo hidden');
+$expect(
+    !str_contains($invalid, '<img') && str_contains($invalid, $translator->translate('invalid')),
+    'Invalid photo hidden'
+);
 echo "Template tests passed\n";

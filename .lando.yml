@@ -48,3 +48,9 @@ tooling:
   lint:
     service: appserver
     cmd: composer lint
+  cs:
+    service: appserver
+    cmd: composer cs
+  cs-fix:
+    service: appserver
+    cmd: composer cs:fix

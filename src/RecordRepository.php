@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Neniu\Verify;
@@ -27,7 +28,10 @@ final class RecordRepository
         $query->bindValue(':mime', $record['image']['mime']);
         $query->bindValue(':sha256', $record['image']['sha256']);
         $query->bindValue(':image', $bytes, PDO::PARAM_LOB);
-        $query->bindValue(':metadata', json_encode($record['metadata'] ?? new stdClass(), JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE));
+        $query->bindValue(':metadata', json_encode(
+            $record['metadata'] ?? new stdClass(),
+            JSON_THROW_ON_ERROR | JSON_INVALID_UTF8_SUBSTITUTE,
+        ));
         $query->execute();
     }
 
@@ -69,11 +73,17 @@ final class RecordRepository
             return null;
         }
         $bytes = base64_decode($record['image']['base64'] ?? '', true);
-        if ($bytes === false || !isset(
-            $record['created_at'], $record['location']['latitude'],
-            $record['location']['longitude'], $record['location']['accuracy_meters'],
-            $record['location']['source'], $record['image']['mime'], $record['image']['sha256']
-        )) {
+        if (
+            $bytes === false || !isset(
+                $record['created_at'],
+                $record['location']['latitude'],
+                $record['location']['longitude'],
+                $record['location']['accuracy_meters'],
+                $record['location']['source'],
+                $record['image']['mime'],
+                $record['image']['sha256']
+            )
+        ) {
             return null;
         }
         $this->save($record, $bytes);

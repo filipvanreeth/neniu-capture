@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<ruleset name="Neniu Verify">
+    <description>PSR-12 for application code, translations and tests.</description>
+
+    <file>public/index.php</file>
+    <file>src</file>
+    <file>translations</file>
+    <file>tests</file>
+    <file>dev-router.php</file>
+
+    <arg name="extensions" value="php"/>
+    <arg name="colors"/>
+    <arg value="sp"/>
+
+    <rule ref="PSR12"/>
+</ruleset>
