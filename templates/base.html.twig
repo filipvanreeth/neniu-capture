@@ -11,10 +11,10 @@
     <link rel="stylesheet" href="{{ assets.stylesheet }}">
 </head>
 
-<body>
-    <main>
-        <h1>{{ t('app_name') }}</h1>
-        <p>{{ t('intro') }}</p>
+<body class="m-0 bg-zinc-100 p-6 font-sans text-base leading-[normal] text-black max-[480px]:p-3">
+    <main class="box-content mx-auto max-w-[540px] rounded-[14px] bg-white p-6 max-[480px]:p-5">
+        <h1 class="my-[0.67em] text-[2em] font-bold">{{ t('app_name') }}</h1>
+        <p class="my-4">{{ t('intro') }}</p>
 
         {% block content %}{% endblock %}
     </main>

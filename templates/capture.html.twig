@@ -1,20 +1,21 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
-    <p>
+    {% set buttonClasses = 'min-h-12 cursor-pointer rounded-lg border-0 bg-[#202020] px-[18px] py-3 text-base leading-[1.3] text-white disabled:opacity-50' %}
+    <p class="my-4">
         {{ t('consent_notice') }}
     </p>
 
-    <video id="video" autoplay playsinline muted></video>
-    <canvas id="canvas" hidden></canvas>
+    <video id="video" class="my-3 w-full rounded-lg" autoplay playsinline muted></video>
+    <canvas id="canvas" class="my-3 w-full rounded-lg" hidden></canvas>
 
-    <div class="camera-actions">
-        <button id="start">{{ t('start_camera') }}</button>
-        <button id="switch-camera" disabled>{{ t('switch_camera') }}</button>
-        <button id="capture" disabled>{{ t('capture') }}</button>
+    <div class="grid grid-cols-2 gap-3 max-[480px]:grid-cols-1">
+        <button id="start" class="{{ buttonClasses }}">{{ t('start_camera') }}</button>
+        <button id="switch-camera" class="{{ buttonClasses }}" disabled>{{ t('switch_camera') }}</button>
+        <button id="capture" class="{{ buttonClasses }} col-span-full" disabled>{{ t('capture') }}</button>
     </div>
 
-    <p id="status"></p>
+    <p id="status" class="my-4" role="status" aria-live="polite"></p>
 {% endblock %}
 
 {% block scripts %}

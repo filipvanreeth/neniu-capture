@@ -1,4 +1,5 @@
 import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite';
 import { readFileSync } from 'node:fs';
 
 const backendOrigin = process.env.VITE_BACKEND_ORIGIN;
@@ -6,6 +7,7 @@ const devOrigin = process.env.VITE_DEV_ORIGIN;
 const devUrl = devOrigin ? new URL(devOrigin) : null;
 
 export default defineConfig({
+    plugins: [tailwindcss()],
     base: './',
     publicDir: false,
     server: {

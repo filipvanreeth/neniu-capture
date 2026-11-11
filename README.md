@@ -304,3 +304,18 @@ Composer-afhankelijkheden. De document root moet naar `public/` wijzen; houd de 
 `npm test` controleert camerawissel, geweigerde camera- en locatietoegang en
 upload- en netwerkfouten met nagebootste browser-API's. Echte toestelpermissies
 en camerabeelden moeten daarnaast handmatig in de browser worden gecontroleerd.
+
+
+## Tailwind CSS
+
+De frontend gebruikt Tailwind CSS 4 via de officiële `@tailwindcss/vite`-plugin.
+`assets/css/app.css` importeert Tailwind, stelt het systeemlettertype in en
+registreert `templates/` expliciet als bron voor utilityclasses. Gebruik volledige
+classnamen in Twig; bouw classnamen niet uit losse dynamische delen op, omdat
+de scanner die niet kan herkennen. Gedeelde knopclasses staan als volledige
+string in de capturetemplate.
+
+De bestaande commando's blijven gelijk: `lando npm run dev` voor ontwikkeling
+en `lando npm run build` voor productie. Tailwind genereert alleen CSS en voegt
+geen JavaScript-runtime toe. De geïnstalleerde versies staan vastgelegd in
+`package-lock.json`.
