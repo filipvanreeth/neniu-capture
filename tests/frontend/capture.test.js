@@ -16,7 +16,7 @@ function mockNavigator(t, value) {
 test('camera switches facing mode and stops the previous stream', async t => {
     let stopped = 0;
     const constraints = [];
-    const track = { stop: () => stopped++, getSettings: () => ({}) };
+    const track = { label: 'Test Camera', stop: () => stopped++, getSettings: () => ({}) };
     mockNavigator(t, { mediaDevices: { getUserMedia: async options => {
         constraints.push(options);
         return { getTracks: () => [track], getVideoTracks: () => [track] };
@@ -25,6 +25,7 @@ test('camera switches facing mode and stops the previous stream', async t => {
     const camera = new Camera(video);
     await camera.open('user');
     assert.equal(video.hidden, false);
+    assert.equal(camera.label(), 'Test Camera');
     await camera.open('environment', true);
     assert.equal(stopped, 1);
     assert.equal(camera.facingMode, 'environment');
@@ -32,6 +33,7 @@ test('camera switches facing mode and stops the previous stream', async t => {
     camera.stop();
     assert.equal(stopped, 2);
     assert.equal(video.srcObject, null);
+    assert.equal(camera.label(), '');
     assert.equal(video.hidden, true);
 });
 
@@ -67,11 +69,12 @@ test('upload includes session token and photo/location timestamps', async t => {
         assert.equal(options.body.get('captured_at'), '1234');
         assert.equal(options.body.get('location_timestamp'), '1200');
         assert.equal(options.body.get('lat'), '50');
+        assert.equal(options.body.get('camera_label'), 'Test Camera');
         return { ok: true, json: async () => ({ code: 'saved' }) };
     });
     const api = new VerificationApi('/app/?lang=en', 'Save failed');
     assert.deepEqual(await api.save({ token: 'one-time-token' }, { image: 'jpeg', capturedAt: 1234 },
-        { timestamp: 1200.8, coords: { latitude: 50, longitude: 4, accuracy: 12 } }), { code: 'saved' });
+        { timestamp: 1200.8, coords: { latitude: 50, longitude: 4, accuracy: 12 } }, 'Test Camera'), { code: 'saved' });
 });
 
 test('API and network errors are propagated', async t => {

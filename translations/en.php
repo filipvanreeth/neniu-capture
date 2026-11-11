@@ -18,6 +18,9 @@ return [
     'show_map' => 'Show map',
     'map_tile_error' => 'Some map tiles could not be loaded. The recorded coordinates remain available above.',
     'map_requires_js' => 'Enable JavaScript to view the map. The coordinates are listed above.',
+    'ip_address' => 'Upload IP address',
+    'camera_label' => 'Camera reported by browser',
+    'not_available' => 'Not available',
     'record_details' => 'Captured details',
     'code' => 'Reference ID',
     'timestamp' => 'Received at',
@@ -40,10 +43,11 @@ return [
         . ' You\'ll receive a link to share for review.',
     'capture_privacy_title' => 'Before you send',
     'capture_data_title' => 'What we save',
-    'capture_data_description' => 'Your photo and location, IP address, browser information, capture and location'
-        . ' measurement times, and technical photo details.',
+    'capture_data_description' => 'Your photo and location, IP address, browser and camera information,'
+        . ' capture and location measurement times, and technical photo details.',
     'capture_access_title' => 'Who can view it',
-    'capture_access_description' => 'Anyone with the verification link can view your saved photo and location.',
+    'capture_access_description' => 'Anyone with the verification link can view your saved photo, location,'
+        . ' IP address and available camera information.',
     'start_camera' => 'Start camera',
     'switch_camera' => 'Switch camera',
     'capture' => 'Take and save photo',

@@ -83,7 +83,7 @@ capture.addEventListener('click', async () => {
         const position = await getLocation();
         const photo = takePhoto(video, t('camera_not_ready'));
         status.show(t('saving_photo'));
-        const saved = await api.save(session, photo, position);
+        const saved = await api.save(session, photo, position, camera.label());
         resultLink.show(saved.url, window.location.href);
         capturePrivacy.hidden = true;
         drawPreview(canvas, photo);

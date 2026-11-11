@@ -22,6 +22,10 @@ export class Camera {
         }
     }
 
+    label() {
+        return this.stream?.getVideoTracks()[0]?.label || '';
+    }
+
     stop() {
         this.stream?.getTracks().forEach(track => track.stop());
         this.stream = null;

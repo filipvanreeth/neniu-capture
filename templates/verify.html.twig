@@ -36,6 +36,14 @@
                     <dt class="font-medium text-zinc-600">{{ t('accuracy') }}</dt>
                     <dd class="text-zinc-900" title="{{ record.location.accuracy_meters }} {{ t('meters') }}">{{ record.location.accuracy_meters|round(0, 'ceil')|number_format(0, '.', ',') }} {{ t('meters') }}</dd>
                 </div>
+                <div class="grid gap-1 px-4 py-3 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-4">
+                    <dt class="font-medium text-zinc-600">{{ t('ip_address') }}</dt>
+                    <dd class="min-w-0 select-all break-all font-mono text-zinc-900">{{ record.metadata.request.ip.address|default(t('not_available')) }}</dd>
+                </div>
+                <div class="grid gap-1 px-4 py-3 sm:grid-cols-[9rem_minmax(0,1fr)] sm:gap-4">
+                    <dt class="font-medium text-zinc-600">{{ t('camera_label') }}</dt>
+                    <dd class="min-w-0 break-words text-zinc-900">{{ record.metadata.browser.camera_label|default(t('not_available')) }}</dd>
+                </div>
             </dl>
         </section>
         <section class="my-5" aria-labelledby="map-title">

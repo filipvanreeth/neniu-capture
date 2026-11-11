@@ -126,6 +126,8 @@ final class Application
                     'browser' => [
                         'source' => 'browser_unverified',
                         'user_agent' => substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 2048),
+                        'camera_label' => is_string($_POST['camera_label'] ?? null)
+                            ? substr(trim($_POST['camera_label']), 0, 256) : null,
                         'captured_at' => $capturedAt,
                         'location_measured_at' => $locationAt,
                     ],

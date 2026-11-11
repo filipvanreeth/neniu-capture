@@ -136,22 +136,13 @@ Onbekende, verlopen en gebruikte tokens leveren HTTP 409 op. Bij een nieuwe
 opnamepoging vraagt de browser een nieuw token aan. De sessie koppelt een
 inzending aan de tokenuitgifte; ze bewijst geen identiteit of live opname.
 
-### Vertrouwde proxies
+### IP-adres van de verbinding
 
-Standaard wordt alleen `REMOTE_ADDR` gebruikt. Stel achter een reverse proxy
-of CDN de omgevingsvariabele `TRUSTED_PROXIES` in met een kommagescheiden lijst
-van exacte proxy-IP-adressen (IPv4/IPv6, geen CIDR), bijvoorbeeld:
-
-```text
-TRUSTED_PROXIES=192.0.2.10,2001:db8::10
-```
-
-Gebruik uitsluitend de werkelijke adressen van je eigen vertrouwde proxies.
-De server verwerkt `X-Forwarded-For` van rechts naar links zolang de huidige
-hop vertrouwd is, en stopt bij het eerste niet-vertrouwde adres. Een ongeldige
-keten valt terug op `REMOTE_ADDR`. Andere forwardingheaders worden genegeerd.
-Configureer je proxy om deze header correct te zetten; voeg geen willekeurige
-clientnetwerken aan de vertrouwenslijst toe.
+De applicatie bewaart uitsluitend `REMOTE_ADDR`, het IP-adres van de directe
+verbinding met PHP. Forwardingheaders zoals `X-Forwarded-For` en `X-Real-IP`
+worden altijd genegeerd. Dit gedrag is hetzelfde in development en productie.
+Achter Lando, ngrok, een reverse proxy of CDN kan dit dus het adres van de
+proxy zijn in plaats van het publieke IP-adres van de bezoeker.
 
 ### Controles
 
@@ -171,7 +162,7 @@ metadatabehoud, proxyvertrouwen, timestamps, eenmalig gebruik, verval en rollbac
 - `src/Database.php`: maakt de SQLite-verbinding en voert schemamigraties uit.
 - `src/RecordRepository.php`: bewaart en leest records, inclusief JSON-import.
 - `src/VerificationService.php`: geeft tokens uit en slaat inzendingen atomair op.
-- `src/ClientIpResolver.php`: bepaalt het client-IP met vertrouwde proxies.
+- `src/ClientIpResolver.php`: leest uitsluitend het directe IP-adres uit `REMOTE_ADDR`.
 - `src/Clock.php`: levert UTC-tijden en converteert browsertimestamps.
 
 Voer na het bijwerken van de autoloadconfiguratie `composer dump-autoload` uit.
@@ -405,7 +396,6 @@ Instellingen worden rechtstreeks gelezen uit `$_ENV` en `$_SERVER`;
 - `APP_ENV`: `production` (standaard), `development` of `testing`.
 - `STORAGE_PATH`: standaard `storage`, relatief aan de projectroot of absoluut.
   Kies altijd een pad buiten `public/`.
-- `TRUSTED_PROXIES`: kommagescheiden exacte proxy-IP-adressen, standaard leeg.
 - `VITE_DEV_SERVER`: wordt alleen gebruikt bij development/testing en genegeerd op productie.
 
 Zonder `.env` blijven de standaardinstellingen van toepassing. Een onleesbaar
@@ -531,3 +521,16 @@ knoppen. Deze delen de verificatielink van de opgeslagen foto, met een kort
 begeleidend bericht. Dit verschilt van `/share`, waar de uitnodiging naar de
 capturepagina wordt gedeeld. Messengerknoppen staan op mobiel onder elkaar en
 vanaf 640 px naast elkaar. Het bericht wordt nooit automatisch verstuurd.
+
+
+## IP- en cameragegevens in Captured details
+
+De verificatiepagina toont het bij de upload opgeslagen IP-adres en, voor
+nieuwe opnames, de `MediaStreamTrack.label` van de gebruikte camera. Die naam
+wordt expliciet als browsergerapporteerd getoond: het is geen betrouwbaar
+vastgesteld toestelmerk of model en geen EXIF-gegeven. De browser kan ook slechts
+een algemene naam of geen naam geven. Oudere records zonder deze metadata tonen
+**Not available**. Het IP-adres komt uit het uploadverzoek (met de ingestelde
+proxyvertrouwensregels), niet uit het verzoek van degene die de verificatie bekijkt.
+De vooraf getoonde informatie over opgeslagen en gedeelde gegevens vermeldt
+ook deze velden.

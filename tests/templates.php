@@ -52,6 +52,14 @@ $expect(str_contains($valid, 'src="/build/verify-test.js"'), 'Verification map m
 $expect(str_contains($valid, 'data-accuracy="12"'), 'Recorded accuracy passed to map');
 $expect(str_contains($valid, 'data:image/jpeg;base64,test-image'), 'Verified photo');
 $expect(str_contains($valid, '&lt;script&gt;') && !str_contains($valid, '<script>'), 'Record HTML escaping');
+$expect(str_contains($valid, $translator->translate('not_available')), 'Old records tolerate missing metadata');
+$context['record']['metadata'] = [
+    'request' => ['ip' => ['address' => '192.0.2.15']],
+    'browser' => ['camera_label' => '<script>camera</script>'],
+];
+$withMetadata = $renderer->render('verify.html.twig', $context);
+$expect(str_contains($withMetadata, '192.0.2.15'), 'Stored upload IP is displayed');
+$expect(str_contains($withMetadata, '&lt;script&gt;camera&lt;/script&gt;'), 'Camera label is HTML escaped');
 $context['hashValid'] = false;
 $invalid = $renderer->render('verify.html.twig', $context);
 $expect(

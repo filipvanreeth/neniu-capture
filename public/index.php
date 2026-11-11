@@ -27,10 +27,6 @@ try {
 $environment = $_ENV + $_SERVER;
 $storage = $environment['STORAGE_PATH'] ?? 'storage';
 $storage = str_starts_with($storage, '/') ? $storage : $projectRoot . '/' . $storage;
-$trustedProxies = array_values(array_filter(array_map(
-    'trim',
-    explode(',', $environment['TRUSTED_PROXIES'] ?? ''),
-)));
 $viteDevServer = in_array($environment['APP_ENV'] ?? 'production', ['development', 'testing'], true)
     ? ($environment['VITE_DEV_SERVER'] ?? null) : null;
 
@@ -44,7 +40,7 @@ $application = new Application(
     $storage,
     $translator,
     new Clock(),
-    new ClientIpResolver($trustedProxies),
+    new ClientIpResolver(),
     $router,
 );
 $view = $application->handle();
