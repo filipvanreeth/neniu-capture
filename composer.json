@@ -10,16 +10,16 @@
         "ext-json": "*"
     },
     "autoload": {
-        "files": [
-            "storage.php"
-        ]
+        "psr-4": {
+            "Neniu\\Verify\\": "src/"
+        }
     },
     "scripts": {
         "lint": [
             "@php -l index.php",
             "@php -l i18n.php",
             "@php -l translations/en.php",
-            "@php -l storage.php"
+            "find src tests -name \"*.php\" -exec php -l {} \\;"
         ],
         "test": "@php tests/verification.php"
     },

@@ -52,7 +52,8 @@ composer install
 composer lint
 ```
 
-De applicatie laadt de opslagfuncties via `vendor/autoload.php`.
+De applicatie laadt de klassen in `src/` via Composer PSR-4-autoloading
+(`vendor/autoload.php`).
 SQLite maakt `storage/verify.sqlite` automatisch aan. De PHP-gebruiker moet
 schrijfrechten op `storage/` hebben. Bestaande JSON-records worden bij het
 openen van hun verificatielink geïmporteerd en blijven als back-up bewaard.
@@ -129,3 +130,16 @@ composer test
 
 De tests gebruiken een tijdelijke database en controleren schemamigratie,
 metadatabehoud, proxyvertrouwen, timestamps, eenmalig gebruik, verval en rollback.
+
+
+## Codestructuur
+
+- `index.php`: maakt de applicatie aan en rendert de bestaande pagina.
+- `src/Application.php`: verwerkt upload-, sessie- en verificatieverzoeken.
+- `src/Database.php`: maakt de SQLite-verbinding en voert schemamigraties uit.
+- `src/RecordRepository.php`: bewaart en leest records, inclusief JSON-import.
+- `src/VerificationService.php`: geeft tokens uit en slaat inzendingen atomair op.
+- `src/ClientIpResolver.php`: bepaalt het client-IP met vertrouwde proxies.
+- `src/Clock.php`: levert UTC-tijden en converteert browsertimestamps.
+
+Voer na het bijwerken van de autoloadconfiguratie `composer dump-autoload` uit.
