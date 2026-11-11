@@ -7,10 +7,11 @@ function createResult() {
     const input = { value: '', focus() { this.focused = true; }, select() { this.selected = true; } };
     const link = {};
     const status = { textContent: '', dataset: {}, hidden: true };
+    const messengers = { whatsapp: {}, telegram: {} };
     const result = new ResultLink(section, input, link, status, {
-        link_copied: 'Copied', copy_link_manually: 'Copy manually',
-    });
-    return { result, section, input, link, status };
+        link_copied: 'Copied', copy_link_manually: 'Copy manually', result_share_message: 'My photo for review.',
+    }, messengers);
+    return { result, section, input, link, status, messengers };
 }
 
 function mockClipboard(t, clipboard) {
@@ -54,4 +55,19 @@ test('clipboard failure selects the link for manual copying', async t => {
     assert.equal(state.input.selected, true);
     assert.equal(state.status.textContent, 'Copy manually');
     assert.equal(state.status.dataset.status, 'warning');
+});
+
+
+test('result messengers share the saved verification link and update for a new photo', () => {
+    const { result, input, messengers } = createResult();
+    result.show('/app/verify/first?lang=en', 'https://capture.neniu.help/app/');
+    const whatsapp = new URL(messengers.whatsapp.href);
+    const telegram = new URL(messengers.telegram.href);
+    assert.equal(whatsapp.searchParams.get('text'), 'My photo for review.\n\n' + input.value);
+    assert.equal(telegram.searchParams.get('url'), input.value);
+    assert.equal(telegram.searchParams.get('text'), 'My photo for review.');
+    assert.match(input.value, /\/verify\/first/);
+    result.show('/app/verify/second?lang=en', 'https://capture.neniu.help/app/');
+    assert.equal(new URL(messengers.telegram.href).searchParams.get('url'), input.value);
+    assert.match(new URL(messengers.whatsapp.href).searchParams.get('text'), /\/verify\/second/);
 });

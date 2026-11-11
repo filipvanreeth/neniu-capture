@@ -12,6 +12,8 @@ $router = new Router();
 $cases = [
     ['GET', '/', Dispatcher::FOUND, 'capture'],
     ['GET', '/index.php?lang=en', Dispatcher::FOUND, 'capture'],
+    ['GET', '/share?lang=en', Dispatcher::FOUND, 'share'],
+    ['POST', '/share', Dispatcher::METHOD_NOT_ALLOWED, null],
     ['POST', '/', Dispatcher::FOUND, 'upload'],
     ['POST', '/index.php', Dispatcher::FOUND, 'upload'],
     ['GET', '/verify/' . $code . '?lang=en', Dispatcher::FOUND, 'verify'],

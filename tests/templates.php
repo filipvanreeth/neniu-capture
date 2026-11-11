@@ -17,7 +17,7 @@ $expect = static function (bool $condition, string $message): void {
 $renderer = new TemplateRenderer(dirname(__DIR__) . '/templates', $translator);
 $context = [
     'assets' => ['devClient' => null, 'stylesheet' => '/build/app-test.css', 'capture' => '/build/capture-test.js',
-        'verify' => '/build/verify-test.js'],
+        'verify' => '/build/verify-test.js', 'share' => '/build/share-test.js'],
     'locale' => $translator->locale(),
     'messages' => $translator->messages() + ['test_payload' => '</script><script>alert(1)</script>'],
     'captureUrl' => '/?lang=en',
@@ -58,4 +58,9 @@ $expect(
     !str_contains($invalid, '<img') && str_contains($invalid, $translator->translate('invalid')),
     'Invalid photo hidden'
 );
+$share = $renderer->render('share.html.twig', $context);
+$expect(str_contains($share, 'id="share-whatsapp"'), 'WhatsApp invitation action');
+$expect(str_contains($share, 'data-capture-path="/?lang=en"'), 'Share page links to capture');
+$expect(!str_contains($share, 'id="video"'), 'Share page must not request camera access');
+$expect(str_contains($share, 'src="/build/share-test.js"'), 'Share page module');
 echo "Template tests passed\n";

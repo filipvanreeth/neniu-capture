@@ -43,14 +43,18 @@
         <p class="my-2 text-base">{{ t('share_instructions') }}</p>
         <label for="result-url" class="mb-1 block font-medium">{{ t('share_link') }}</label>
         <input id="result-url" type="url" readonly class="mb-3 w-full min-w-0 rounded-lg border border-zinc-300 p-3">
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <a id="result-whatsapp" class="{{ buttonClasses }} inline-flex w-full items-center justify-center border-emerald-700 bg-emerald-700 text-white no-underline hover:bg-emerald-800 active:bg-emerald-900 focus-visible:outline-emerald-600" target="_blank" rel="noopener noreferrer">{{ t('send_whatsapp') }}</a>
+            <a id="result-telegram" class="{{ buttonClasses }} inline-flex w-full items-center justify-center border-sky-700 bg-sky-700 text-white no-underline hover:bg-sky-800 active:bg-sky-900 focus-visible:outline-sky-600" target="_blank" rel="noopener noreferrer">{{ t('send_telegram') }}</a>
+        </div>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <button id="copy-link" type="button" class="{{ buttonClasses }} {{ primaryButtonClasses }}">{{ t('copy_link') }}</button>
             <a id="view-result" class="{{ buttonClasses }} {{ secondaryButtonClasses }} inline-flex items-center justify-center no-underline hover:bg-blue-100 active:bg-blue-200" target="_blank" rel="noopener noreferrer">{{ t('view_result') }}</a>
         </div>
         <p id="copy-status" class="status-label mt-3" role="status" aria-live="polite" aria-atomic="true" hidden></p>
     </section>
     <p id="status" class="status-label my-4" role="status" aria-live="polite" aria-atomic="true" hidden></p>
-    <aside class="mb-6 mt-4 rounded-xl border border-zinc-200 p-4" aria-labelledby="capture-privacy">
+    <aside id="capture-privacy-section" class="mb-6 mt-4 rounded-xl border border-zinc-200 p-4" aria-labelledby="capture-privacy">
         <h2 id="capture-privacy" class="mb-3 text-sm font-semibold text-zinc-900">{{ t('capture_privacy_title') }}</h2>
         <dl class="space-y-3 text-sm leading-relaxed">
             <div>

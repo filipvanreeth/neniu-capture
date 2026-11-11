@@ -22,6 +22,7 @@ try {
         'assets/css/app.css' => ['file' => 'assets/app-hash.css'],
         'assets/js/capture.js' => ['file' => 'assets/capture-hash.js'],
         'assets/js/verify.js' => ['file' => 'assets/verify-hash.js'],
+        'assets/js/share.js' => ['file' => 'assets/share-hash.js'],
     ], JSON_THROW_ON_ERROR));
     $capture = $assets->forPage(true);
     if (
@@ -43,6 +44,13 @@ try {
     $verify = $assets->forPage(false, true);
     if ($verify['verify'] !== '/app/build/assets/verify-hash.js' || $verify['capture'] !== null) {
         throw new RuntimeException('Verification map entry must load independently from capture');
+    }
+    $share = $assets->forPage(false, false, true);
+    if (
+        $share['share'] !== '/app/build/assets/share-hash.js'
+        || $share['capture'] !== null || $share['verify'] !== null
+    ) {
+        throw new RuntimeException('Share page must load its own module only');
     }
     echo "Asset tests passed\n";
 } finally {

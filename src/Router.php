@@ -17,6 +17,7 @@ final class Router
     {
         $this->dispatcher = simpleDispatcher(function (RouteCollector $routes): void {
             $routes->addRoute('GET', '/', 'capture');
+            $routes->addRoute('GET', '/share', 'share');
             $routes->addRoute('GET', '/index.php', 'capture');
             $routes->addRoute('POST', '/', 'upload');
             $routes->addRoute('POST', '/index.php', 'upload');

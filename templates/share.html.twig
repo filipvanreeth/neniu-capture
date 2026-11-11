@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block introduction %}
+    <p class="mt-3 text-sm font-medium text-blue-700">{{ t('request_photo_title') }}</p>
+    <p class="mt-2 text-base leading-relaxed text-zinc-600">{{ t('request_photo_intro') }}</p>
+{% endblock %}
+
+{% block content %}
+    <section class="rounded-xl border border-zinc-200 bg-zinc-50 p-4 sm:p-5" aria-labelledby="capture-link-label">
+        <label id="capture-link-label" for="capture-share-url" class="mb-2 block text-sm font-semibold text-zinc-900">{{ t('capture_link_label') }}</label>
+        <p id="capture-link-description" class="mb-3 text-sm leading-relaxed text-zinc-600">{{ t('capture_link_description') }}</p>
+        <input id="capture-share-url" type="url" readonly value="{{ captureUrl }}" data-capture-path="{{ captureUrl }}"
+            class="min-h-12 w-full min-w-0 rounded-lg border border-zinc-300 bg-white px-3 py-3 text-sm text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            aria-describedby="capture-link-description">
+    </section>
+
+    <div class="mt-5">
+        <label for="capture-share-message" class="mb-2 block text-sm font-semibold text-zinc-900">{{ t('share_message_label') }}</label>
+        <p id="share-message-hint" class="mb-3 text-sm leading-relaxed text-zinc-600">{{ t('share_message_hint') }}</p>
+        <textarea id="capture-share-message" rows="4" aria-describedby="share-message-hint"
+            class="w-full resize-y rounded-lg border border-zinc-300 bg-white px-3 py-3 text-sm leading-relaxed text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">{{ t('capture_share_message') }}</textarea>
+    </div>
+
+    <div id="share-actions" class="mt-5 space-y-3" hidden>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <a id="share-whatsapp" target="_blank" rel="noopener noreferrer"
+            class="inline-flex min-h-12 w-full items-center justify-center rounded-lg border border-emerald-700 bg-emerald-700 px-4 py-3 text-base font-medium text-white no-underline transition-colors hover:bg-emerald-800 active:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 motion-reduce:transition-none">{{ t('send_whatsapp') }}</a>
+            <a id="share-telegram" target="_blank" rel="noopener noreferrer"
+                class="inline-flex min-h-12 w-full items-center justify-center rounded-lg border border-sky-700 bg-sky-700 px-4 py-3 text-base font-medium text-white no-underline transition-colors hover:bg-sky-800 active:bg-sky-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 motion-reduce:transition-none">{{ t('send_telegram') }}</a>
+        </div>
+        <p class="text-center text-sm leading-relaxed text-zinc-600">{{ t('messenger_share_hint') }}</p>
+        <button id="copy-capture-link" type="button"
+            class="min-h-12 w-full cursor-pointer rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-base font-medium text-blue-800 transition-colors hover:bg-blue-100 active:bg-blue-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 motion-reduce:transition-none">{{ t('copy_message_link') }}</button>
+    </div>
+    <textarea id="share-copy-fallback" readonly rows="5" aria-label="{{ t('copy_message_link') }}"
+        class="mt-4 w-full resize-y rounded-lg border border-zinc-300 bg-zinc-50 p-3 text-sm leading-relaxed" hidden></textarea>
+    <p id="share-status" class="status-label mt-4" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+    <noscript><p class="status-label mt-4" data-status="warning">{{ t('share_requires_js') }}</p></noscript>
+    <a href="{{ captureUrl }}" class="mt-5 inline-block text-sm font-medium text-blue-700 underline underline-offset-4 hover:text-blue-900">{{ t('share_preview') }}</a>
+{% endblock %}
+
+{% block scripts %}
+    <script id="share-config" type="application/json">{{ json_script({messages: {link_copied: t('share_message_copied'), copy_link_manually: t('share_message_manually')}}) }}</script>
+    <script type="module" src="{{ assets.share }}"></script>
+{% endblock %}

@@ -50,8 +50,13 @@ $application = new Application(
 $view = $application->handle();
 $renderer = new TemplateRenderer($projectRoot . '/templates', $translator);
 $assets = new ViteAssets(__DIR__ . '/build', $basePath, $viteDevServer);
-echo $renderer->render($view['isVerification'] ? 'verify.html.twig' : 'capture.html.twig', [
-    'assets' => $assets->forPage(!$view['isVerification'], $view['isVerification'] && $view['record'] !== null),
+$template = $view['template'] ?? ($view['isVerification'] ? 'verify.html.twig' : 'capture.html.twig');
+echo $renderer->render($template, [
+    'assets' => $assets->forPage(
+        $template === 'capture.html.twig',
+        $view['isVerification'] && $view['record'] !== null,
+        $template === 'share.html.twig',
+    ),
     'locale' => $locale,
     'messages' => $translator->messages(),
     'captureUrl' => $router->captureUrl($locale),

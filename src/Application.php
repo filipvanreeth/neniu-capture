@@ -30,6 +30,9 @@ final class Application
             header('Allow: ' . implode(', ', $route[1]));
             $this->respond(['error' => $this->translator->translate('method_not_allowed')], 405);
         }
+        if ($route[1] === 'share') {
+            return ['template' => 'share.html.twig', 'record' => null, 'hashValid' => false, 'isVerification' => false];
+        }
         $locale = $this->translator->locale();
         $receivedAt = $this->clock->now();
         $requestId = bin2hex(random_bytes(16));

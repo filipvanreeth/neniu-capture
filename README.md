@@ -492,3 +492,42 @@ De openbare tegeldienst is beschikbaar op best-effortbasis, zonder SLA, en is
 geen onbeperkte gratis API. Volg de officiële gebruiksvoorwaarden en kies bij
 veel verkeer een passende OSM-tegelprovider of eigen hosting:
 https://operations.osmfoundation.org/policies/tiles/
+
+
+## Een capture-uitnodiging delen
+
+Open `/share` (bijvoorbeeld `https://capture.neniu.help/share?lang=en`).
+Deze aparte pagina toont de capture-link, een groene **Send via WhatsApp**-knop
+en een secundaire **Copy link**-knop. WhatsApp krijgt een vooraf ingevuld bericht
+met de capture-link; de gebruiker kiest zelf een contact en verstuurt het bericht.
+De app verstuurt niets automatisch en vraagt geen contacten op.
+
+De uitnodiging verwijst naar de opnamepagina `/`, niet naar `/verify/{code}`.
+Na de opname kan de ontvanger de verificatielink terugsturen. De absolute
+capture-link wordt in de browser samengesteld, zodat domein, eventuele submap
+en taal ook via een tunnel correct blijven. Bij ontbrekende clipboardtoegang
+wordt de link geselecteerd voor handmatig kopiëren. Voor delen is JavaScript nodig.
+De deelpagina laadt geen camera-, locatie- of kaartmodule.
+
+
+Op `/share` is de begeleidende tekst bewerkbaar. Zowel **Send via WhatsApp** als
+**Copy message and link** gebruiken de actuele tekst, gevolgd door de capture-link.
+Bij een lege tekst wordt alleen de link gedeeld. De tekst wordt niet opgeslagen
+op de server of in browseropslag. Bij ontbrekende clipboardtoegang verschijnt
+het volledige bericht met de link geselecteerd in een apart veld voor handmatig
+kopiëren; de bewerkbare begeleidende tekst blijft daarbij behouden.
+
+
+De deelpagina ondersteunt ook **Send via Telegram**, via de officiële
+`https://t.me/share/url`-deellink. Beide deelknoppen gebruiken de actuele
+bewerkbare tekst en capture-link. Op kleine schermen staan ze onder elkaar;
+vanaf 640 px staan WhatsApp en Telegram naast elkaar. De gebruiker kiest zelf
+de ontvanger en bevestigt het versturen in de gekozen app. Er is geen bot of
+API-key nodig.
+
+
+Na een geslaagde opname bevat **Your photo link** ook WhatsApp- en Telegram-
+knoppen. Deze delen de verificatielink van de opgeslagen foto, met een kort
+begeleidend bericht. Dit verschilt van `/share`, waar de uitnodiging naar de
+capturepagina wordt gedeeld. Messengerknoppen staan op mobiel onder elkaar en
+vanaf 640 px naast elkaar. Het bericht wordt nooit automatisch verstuurd.

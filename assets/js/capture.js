@@ -17,6 +17,7 @@ const canvas = document.querySelector('#canvas');
 const status = new StatusLabel(document.querySelector('#status'));
 const start = document.querySelector('#start');
 const captureGuide = document.querySelector('#capture-guide-section');
+const capturePrivacy = document.querySelector('#capture-privacy-section');
 const capture = document.querySelector('#capture');
 const switchCamera = document.querySelector('#switch-camera');
 const resultLink = new ResultLink(
@@ -25,6 +26,7 @@ const resultLink = new ResultLink(
     document.querySelector('#view-result'),
     document.querySelector('#copy-status'),
     messages,
+    { whatsapp: document.querySelector('#result-whatsapp'), telegram: document.querySelector('#result-telegram') },
 );
 document.querySelector('#copy-link').addEventListener('click', () => resultLink.copy());
 const camera = new Camera(video);
@@ -37,6 +39,7 @@ function setBusy(busy) {
 }
 
 async function openCamera(mode = camera.facingMode, exact = false) {
+    capturePrivacy.hidden = false;
     setBusy(true);
     try {
         await camera.open(mode, exact);
@@ -82,6 +85,7 @@ capture.addEventListener('click', async () => {
         status.show(t('saving_photo'));
         const saved = await api.save(session, photo, position);
         resultLink.show(saved.url, window.location.href);
+        capturePrivacy.hidden = true;
         drawPreview(canvas, photo);
         video.hidden = true;
         canvas.hidden = false;
