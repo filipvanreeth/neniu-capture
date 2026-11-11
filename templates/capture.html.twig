@@ -70,6 +70,6 @@
 {% endblock %}
 
 {% block scripts %}
-    <script id="capture-config" type="application/json">{{ json_script({locale: locale, messages: messages, endpoint: captureUrl}) }}</script>
+    <script id="capture-config" type="application/json">{{ json_script({appUrl: appUrl|default(''), locale: locale, messages: messages, endpoint: captureUrl}) }}</script>
     <script type="module" src="{{ assets.capture }}"></script>
 {% endblock %}

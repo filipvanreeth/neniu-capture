@@ -25,6 +25,21 @@ try {
 }
 // phpdotenv preserves existing server/container variables.
 $environment = $_ENV + $_SERVER;
+$appUrl = rtrim(trim($environment['APP_URL'] ?? ''), '/');
+if ($appUrl !== '') {
+    $parts = parse_url($appUrl);
+    if (
+        !filter_var($appUrl, FILTER_VALIDATE_URL)
+        || !in_array($parts['scheme'] ?? '', ['http', 'https'], true)
+        || isset($parts['user']) || isset($parts['pass'])
+        || isset($parts['query']) || isset($parts['fragment'])
+        || !empty($parts['path'])
+    ) {
+        error_log('APP_URL must be an HTTP(S) origin without path, credentials, query or fragment.');
+        http_response_code(500);
+        exit('Application configuration unavailable.');
+    }
+}
 $storage = $environment['STORAGE_PATH'] ?? 'storage';
 $storage = str_starts_with($storage, '/') ? $storage : $projectRoot . '/' . $storage;
 $viteDevServer = in_array($environment['APP_ENV'] ?? 'production', ['development', 'testing'], true)
@@ -53,6 +68,7 @@ echo $renderer->render($template, [
         $view['isVerification'] && $view['record'] !== null,
         $template === 'share.html.twig',
     ),
+    'appUrl' => $appUrl,
     'locale' => $locale,
     'messages' => $translator->messages(),
     'captureUrl' => $router->captureUrl($locale),

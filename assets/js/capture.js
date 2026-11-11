@@ -6,7 +6,7 @@ import { takePhoto, drawPreview } from './photo.js';
 import { ResultLink } from './result-link.js';
 import { StatusLabel } from './status-label.js';
 
-const { messages, endpoint } = JSON.parse(document.querySelector('#capture-config').textContent);
+const { messages, endpoint, appUrl } = JSON.parse(document.querySelector('#capture-config').textContent);
 function t(key, parameters = {}) {
     return (messages[key] ?? key).replace(/\{(\w+)\}/g,
         (placeholder, name) => Object.hasOwn(parameters, name) ? String(parameters[name]) : placeholder);
@@ -84,7 +84,7 @@ capture.addEventListener('click', async () => {
         const photo = takePhoto(video, t('camera_not_ready'));
         status.show(t('saving_photo'));
         const saved = await api.save(session, photo, position, camera.label());
-        resultLink.show(saved.url, window.location.href);
+        resultLink.show(saved.url, appUrl || window.location.href);
         capturePrivacy.hidden = true;
         drawPreview(canvas, photo);
         video.hidden = true;

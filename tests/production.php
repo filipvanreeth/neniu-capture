@@ -22,6 +22,7 @@ try {
         2 => ['pipe', 'w'],
     ], $pipes, null, array_merge(getenv(), [
         'APP_ENV' => 'production',
+        'APP_URL' => 'https://capture.example.test/',
         'VITE_DEV_SERVER' => 'https://unused-vite.example.test',
         'STORAGE_PATH' => $directory . '/storage',
     ]));
@@ -39,6 +40,7 @@ try {
         || !str_contains($html, '/build/assets/capture-production.js')
         || str_contains($html, 'unused-vite.example.test')
         || str_contains($html, '/@vite/client')
+        || !str_contains($html, 'https:\/\/capture.example.test')
     ) {
         throw new RuntimeException('Production must use manifest assets regardless of VITE_DEV_SERVER');
     }

@@ -546,3 +546,14 @@ projectmap op je computer. Open een pagina met `?XDEBUG_TRIGGER=1` (of voeg
 Xdebug-browserextensie voor een debugcookie die ook bij uploads meegaat.
 Voor een CLI-script: `lando ssh -s appserver -c "XDEBUG_TRIGGER=1 php tests/verification.php"`.
 Zonder trigger start geen debugsessie. Deze configuratie geldt uitsluitend voor Lando.
+
+### Publieke URL voor deellinks
+
+Stel in productie `APP_URL=https://capture.neniu.help` in via `.env` of de
+serveromgeving. Gebruik alleen de origin (http/https, host en eventueel poort),
+zonder pad, queryparameters of fragment. Capture- en verificatielinks voor
+WhatsApp, Telegram en het klembord gebruiken deze vaste origin.
+
+Laat `APP_URL` leeg voor lokaal testen en ngrok: deellinks gebruiken dan de
+huidige browser-URL. Interne routes, uploads en assets blijven relatief aan de
+huidige website. Een wijziging aan `APP_URL` vereist geen nieuwe frontendbuild.

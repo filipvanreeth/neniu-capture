@@ -40,6 +40,6 @@
 {% endblock %}
 
 {% block scripts %}
-    <script id="share-config" type="application/json">{{ json_script({messages: {link_copied: t('share_message_copied'), copy_link_manually: t('share_message_manually')}}) }}</script>
+    <script id="share-config" type="application/json">{{ json_script({appUrl: appUrl|default(''), messages: {link_copied: t('share_message_copied'), copy_link_manually: t('share_message_manually')}}) }}</script>
     <script type="module" src="{{ assets.share }}"></script>
 {% endblock %}

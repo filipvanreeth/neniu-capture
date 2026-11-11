@@ -1,7 +1,7 @@
 import 'vite/modulepreload-polyfill';
 import { CaptureShare } from './capture-share.js';
 
-const { messages } = JSON.parse(document.querySelector('#share-config').textContent);
+const { messages, appUrl } = JSON.parse(document.querySelector('#share-config').textContent);
 const message = document.querySelector('#capture-share-message');
 const whatsapp = document.querySelector('#share-whatsapp');
 const telegram = document.querySelector('#share-telegram');
@@ -14,7 +14,7 @@ const share = new CaptureShare({
     fallback: document.querySelector('#share-copy-fallback'),
     messages,
 });
-share.prepare(window.location.href);
+share.prepare(appUrl || window.location.href);
 message.addEventListener('input', () => share.update());
 whatsapp.addEventListener('click', () => share.update());
 telegram.addEventListener('click', () => share.update());
