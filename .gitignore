@@ -2,3 +2,6 @@
 /storage/*
 !/storage/.htaccess
 .DS_Store
+/node_modules/
+/public/build/
+/.lando.local.yml

@@ -161,7 +161,7 @@ onjuiste methodes HTTP 405 met een `Allow`-header.
 Apache moet `mod_rewrite` en `.htaccess`-regels toestaan. De rootconfiguratie
 stuurt niet-bestaande paden naar `index.php`. Configureer bij Nginx een
 vergelijkbare front-controllerregel en behoud de blokkering van opslag en vendor.
-Lokaal kan de applicatie worden gestart met `php -S localhost:8000 index.php`.
+Lokaal kan de applicatie worden gestart met `php -S localhost:8000 dev-router.php`.
 
 
 ## Twig-templates
@@ -171,9 +171,112 @@ variabelen. De pagina's zijn opgesplitst in:
 
 - `templates/base.html.twig`: gedeelde HTML-structuur en styling.
 - `templates/capture.html.twig`: opnamepagina en camerabediening.
-- `templates/capture.js.twig`: capturescript, alleen geladen op de opnamepagina.
 - `templates/verify.html.twig`: verificatieresultaat of melding bij ontbrekend record.
 
 De Twig-functie `t()` gebruikt dezelfde vertalingen als PHP. `json_script()`
-serialiseert waarden veilig voor het inline capturescript.
+serialiseert waarden veilig voor het JSON-configuratieblok van de capturepagina.
 `composer test` controleert ook de templates en escaping.
+
+
+## Frontend: npm en Vite
+
+Gebruik Node.js 22.12 of hoger. PHP, FastRoute en Twig blijven de pagina's en
+endpoints verzorgen. JavaScript gebruikt gewone ES-modules, zonder framework:
+
+- `assets/js/capture.js`: initialisatie en camerabediening.
+- `assets/js/camera.js`: camerastream en camerawissel.
+- `assets/js/location.js`: browserlocatie.
+- `assets/js/verification-api.js`: sessies en uploads.
+- `assets/js/photo.js`: opname en aparte geannoteerde preview.
+- `assets/css/app.css`: gedeelde styling.
+
+Installeer en bouw de frontend na een checkout:
+
+```sh
+npm ci
+npm run build
+npm test
+```
+
+Vite schrijft bestanden met hashes en `.vite/manifest.json` naar `public/build/`.
+`src/ViteAssets.php` leest het manifest en maakt URL's die ook onder een submap
+werken. Twig laadt de gedeelde CSS op beide pagina's en de capturemodule alleen
+op de opnamepagina. Configuratie (taal, vertalingen, endpoint) wordt veilig als
+JSON doorgegeven; JavaScript bevat geen Twig-code.
+
+### Ontwikkelen met automatisch herladen
+
+Start Vite in één terminal:
+
+```sh
+VITE_BACKEND_ORIGIN=http://localhost:8000 npm run dev
+```
+
+Start de PHP-server in een tweede terminal:
+
+```sh
+VITE_DEV_SERVER=http://localhost:5173 php -S localhost:8000 dev-router.php
+```
+
+Open `http://localhost:8000`. `VITE_DEV_SERVER` moet in de omgeving van PHP staan;
+zonder deze variabele gebruikt PHP de productiebuild. Een `.env`-bestand wordt
+door PHP niet automatisch geladen. De ontwikkelrouter serveert uitsluitend de
+gebouwde assets rechtstreeks en stuurt overige paden door naar de applicatie.
+
+### Ontwikkelen binnen Lando
+
+De Landofile bevat een aparte Node 24-service met npm-tooling en een HTTPS-proxy
+voor Vite. De Node-plugin moet geïnstalleerd zijn (zo nodig:
+`lando plugin-add @lando/node`). Na de wijziging van de Landofile:
+
+```sh
+lando rebuild -y
+lando npm run dev
+```
+
+Laat het tweede commando draaien en open `https://neniu-verify.lndo.site`.
+De assets en HMR-WebSocket lopen via `https://vite-neniu-verify.lndo.site`;
+vertrouw de Lando-CA zodat de browser beide HTTPS-hosts accepteert. De proxy
+gebruikt de interne poort 5173; de browser gebruikt de normale HTTPS-poort 443.
+Vite luistert binnen de container via HTTP op `0.0.0.0:5173`. De Lando-proxy
+verzorgt HTTPS met de door Lando gegenereerde certificaten. npm-afhankelijkheden worden tijdens de Node-build
+met `npm ci` geïnstalleerd. De Vite-server start bewust via `lando npm run dev`.
+
+Andere beschikbare commando's:
+
+```sh
+lando node --version
+lando npm run build
+lando npm test
+```
+
+PHP gebruikt in deze Lando-configuratie standaard de Vite-ontwikkelserver.
+Om lokaal de productiebuild te bekijken, voer `lando npm run build` uit en zet
+in een niet-gecommitteerde `.lando.local.yml`:
+
+```yaml
+services:
+  appserver:
+    overrides:
+      environment:
+        VITE_DEV_SERVER: ''
+```
+
+Voer daarna opnieuw `lando rebuild -y` uit. Verwijder de override om terug te
+schakelen naar Vite. Zonder draaiende Vite-server is de ontwikkelconfiguratie
+niet bruikbaar; de productiebuild wordt alleen geladen als `VITE_DEV_SERVER`
+leeg is. Voor een afwijkende externe HTTPS-poort pas je zowel de ingestelde
+origins als de PHP-asset-URL aan.
+
+### Deployment
+
+Voer in de buildomgeving `npm ci` en `npm run build` uit. Publiceer de volledige
+map `public/build/`, inclusief `.vite/manifest.json`, samen met PHP, templates en
+Composer-afhankelijkheden. De projectroot blijft de webroot. Laat
+`VITE_DEV_SERVER` op productie weg. Node.js is op de productieserver niet nodig.
+`node_modules/` en de gegenereerde build worden niet in Git opgenomen;
+`package-lock.json` wel. Behoud het bestaande SQLite-bestand bij deployment.
+
+`npm test` controleert camerawissel, geweigerde camera- en locatietoegang en
+upload- en netwerkfouten met nagebootste browser-API's. Echte toestelpermissies
+en camerabeelden moeten daarnaast handmatig in de browser worden gecontroleerd.

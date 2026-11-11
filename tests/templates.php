@@ -15,6 +15,7 @@ function expect(bool $condition, string $message): void
 
 $renderer = new TemplateRenderer(dirname(__DIR__) . '/templates');
 $context = [
+    'assets' => ['devClient' => null, 'stylesheet' => '/public/build/app-test.css', 'capture' => '/public/build/capture-test.js'],
     'locale' => $locale,
     'messages' => $messages + ['test_payload' => '</script><script>alert(1)</script>'],
     'captureUrl' => '/?lang=en',
@@ -23,9 +24,10 @@ $context = [
 ];
 $capture = $renderer->render('capture.html.twig', $context);
 expect(str_contains($capture, 'id="video"') && str_contains($capture, 'id="capture"'), 'Capture controls');
-expect(str_contains($capture, 'sessionForm.append') && str_contains($capture, 'form.append'), 'Capture upload script');
+expect(str_contains($capture, 'type="module" src="/public/build/capture-test.js"'), 'Capture module');
+expect(str_contains($capture, 'id="capture-config" type="application/json"'), 'Capture configuration');
 expect(!str_contains($capture, '</script><script>alert(1)</script>'), 'Script JSON escaping');
-expect(substr_count($capture, '</script>') === 1, 'Single script closing tag');
+expect(substr_count($capture, '</script>') === 2, 'Only JSON and module script tags');
 expect(str_contains($capture, '\\u003C'), 'JSON escaped script payload');
 
 $missing = $renderer->render('verify.html.twig', $context);

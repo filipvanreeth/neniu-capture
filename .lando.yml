@@ -7,17 +7,40 @@ services:
     webroot: .
     ssl: true
     composer_version: '2'
+    overrides:
+      environment:
+        VITE_DEV_SERVER: https://vite-neniu-verify.lndo.site
     config:
       php: .lando/php.ini
     build:
       - composer install --no-interaction
       - composer check-platform-reqs
 
+  node:
+    type: node:24
+    port: 5173
+    ssl: true
+    sslExpose: false
+    scanner: false
+    overrides:
+      environment:
+        VITE_HOST: 0.0.0.0
+        VITE_DEV_ORIGIN: https://vite-neniu-verify.lndo.site
+        VITE_BACKEND_ORIGIN: https://neniu-verify.lndo.site
+    build:
+      - npm ci
+
 proxy:
   appserver:
     - neniu-verify.lndo.site
+  node:
+    - vite-neniu-verify.lndo.site:5173
 
 tooling:
+  node:
+    service: node
+  npm:
+    service: node
   php:
     service: appserver
   composer:

@@ -6,6 +6,7 @@ use Neniu\Verify\ClientIpResolver;
 use Neniu\Verify\Clock;
 use Neniu\Verify\Router;
 use Neniu\Verify\TemplateRenderer;
+use Neniu\Verify\ViteAssets;
 
 require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/i18n.php';
@@ -24,7 +25,9 @@ $application = new Application(
 );
 $view = $application->handle();
 $renderer = new TemplateRenderer(__DIR__ . '/templates');
+$assets = new ViteAssets(__DIR__ . '/public/build', $basePath, getenv('VITE_DEV_SERVER') ?: null);
 echo $renderer->render($view['isVerification'] ? 'verify.html.twig' : 'capture.html.twig', [
+    'assets' => $assets->forPage(!$view['isVerification']),
     'locale' => $locale,
     'messages' => $messages,
     'captureUrl' => $router->captureUrl($locale),

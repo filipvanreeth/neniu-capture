@@ -18,7 +18,6 @@
 {% endblock %}
 
 {% block scripts %}
-    <script>
-        {% include 'capture.js.twig' %}
-    </script>
+    <script id="capture-config" type="application/json">{{ json_script({locale: locale, messages: messages, endpoint: captureUrl}) }}</script>
+    <script type="module" src="{{ assets.capture }}"></script>
 {% endblock %}
