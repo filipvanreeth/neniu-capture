@@ -275,32 +275,64 @@ lando npm run build
 lando npm test
 ```
 
-PHP gebruikt in deze Lando-configuratie standaard de Vite-ontwikkelserver.
-Om lokaal de productiebuild te bekijken, voer `lando npm run build` uit en zet
-in een niet-gecommitteerde `.lando.local.yml`:
+### Wisselen tussen development en productiepreview
 
-```yaml
-services:
-  appserver:
-    overrides:
-      environment:
-        VITE_DEV_SERVER: ''
+`npm run dev` start de ontwikkelserver; `npm run build` genereert de
+productiebestanden. Deze commando's veranderen `APP_ENV` niet: de PHP-omgeving
+bepaalt welke assets de frontend gebruikt.
+
+De assetmodus wordt gekozen via `.env`, zonder vaste PHP-overrides in Lando.
+Voor development met Vite gebruik je:
+
+```dotenv
+APP_ENV=development
+VITE_DEV_SERVER=https://vite-neniu-verify.lndo.site
 ```
 
-Voer daarna opnieuw `lando rebuild -y` uit. Verwijder de override om terug te
-schakelen naar Vite. Zonder draaiende Vite-server is de ontwikkelconfiguratie
-niet bruikbaar; de productiebuild wordt alleen geladen als `VITE_DEV_SERVER`
-leeg is. Voor een afwijkende externe HTTPS-poort pas je zowel de ingestelde
-origins als de PHP-asset-URL aan.
+Laat daarbij `lando npm run dev` draaien. Voor een productiepreview gebruik je:
 
-### Deployment
+```dotenv
+APP_ENV=production
+VITE_DEV_SERVER=
+```
+
+Voer `lando npm run build` uit en herlaad de pagina. De frontend gebruikt dan
+uitsluitend de bestanden uit `public/build/`, via URL's als
+`/build/assets/app-<hash>.css` en `/build/assets/capture-<hash>.js`.
+In productie wordt een eventueel ingevulde `VITE_DEV_SERVER` genegeerd.
+Vite hoeft niet te draaien. Na deze eenmalige Landofile-wijziging is een rebuild
+nodig om oude containeroverrides te verwijderen; daarna volstaat een wijziging
+van `.env` en het herladen van de pagina. Extern ingestelde servervariabelen
+houden zoals gebruikelijk voorrang boven `.env`.
+
+### CI/CD en deployment
+
+Een CI/CD-runner heeft geen Lando nodig. Gebruik Node.js 22.12 of hoger en
+PHP met de vereiste extensies. Voer vanuit de projectroot uit:
+
+```sh
+npm ci
+npm run build
+composer install --no-dev --optimize-autoloader --no-interaction
+```
+
+`npm ci` gebruikt de vastgelegde versies uit `package-lock.json`. Zorg dat ook
+de ontwikkelafhankelijkheden van npm worden geïnstalleerd: Vite en Tailwind zijn
+nodig tijdens de build. Bij een runner met `NODE_ENV=production` of een ingestelde
+`omit=dev` gebruik je hiervoor `npm ci --include=dev`.
 
 Voer in de buildomgeving `npm ci` en `npm run build` uit. Publiceer de volledige
 map `public/build/`, inclusief `.vite/manifest.json`, samen met PHP, templates en
 Composer-afhankelijkheden. De document root moet naar `public/` wijzen; houd de overige projectmappen erbuiten. Laat
 `VITE_DEV_SERVER` op productie weg. Node.js is op de productieserver niet nodig.
 `node_modules/` en de gegenereerde build worden niet in Git opgenomen;
-`package-lock.json` wel. Behoud het bestaande SQLite-bestand bij deployment.
+`package-lock.json` wel. Stel op de productieserver `APP_ENV=production` in
+en laat `VITE_DEV_SERVER` leeg of weg. Publiceer PHP, templates, manifest en de
+bijbehorende gebouwde assets als één consistente release.
+
+Behoud bij deployment de bestaande `storage/` en productie-`.env`; neem deze
+niet over uit de checkout of lokale ontwikkelomgeving. De build is lokaal
+gecontroleerd; er is nog geen specifieke CI/CD-pipeline in deze repository ingericht.
 
 `npm test` controleert camerawissel, geweigerde camera- en locatietoegang en
 upload- en netwerkfouten met nagebootste browser-API's. Echte toestelpermissies
@@ -371,8 +403,7 @@ Instellingen worden rechtstreeks gelezen uit `$_ENV` en `$_SERVER`;
 Zonder `.env` blijven de standaardinstellingen van toepassing. Een onleesbaar
 of ongeldig `.env`-bestand levert een algemene HTTP 500 op, zonder
 configuratiewaarden of parserdetails in de respons. PHP-fouten worden gelogd; foutweergave staat standaard uit.
-De lokale `.env` gebruikt development; Lando geeft zijn eigen
-developmentwaarden en Vite-URL door. Publiceer de lokale `.env` niet op productie;
+De lokale `.env` staat op productiepreview; Lando legt de PHP-assetmodus niet vast. Publiceer de lokale `.env` niet op productie;
 maak daar een apart bestand of gebruik de serveromgeving.
 
 Vite leest alleen `VITE_`-instellingen voor zijn configuratie en geeft door

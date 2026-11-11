@@ -29,7 +29,8 @@
             "@php tests/routing.php",
             "@php tests/templates.php",
             "@php tests/assets.php",
-            "@php tests/translation.php"
+            "@php tests/translation.php",
+            "@php tests/production.php"
         ],
         "cs": "phpcs",
         "cs:fix": "phpcbf"

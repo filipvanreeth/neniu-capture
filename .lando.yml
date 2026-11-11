@@ -7,10 +7,6 @@ services:
     webroot: public
     ssl: true
     composer_version: '2'
-    overrides:
-      environment:
-        APP_ENV: development
-        VITE_DEV_SERVER: https://vite-neniu-verify.lndo.site
     config:
       php: .lando/php.ini
     build:
