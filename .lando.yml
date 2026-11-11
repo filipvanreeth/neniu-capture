@@ -7,6 +7,11 @@ services:
     webroot: public
     ssl: true
     composer_version: '2'
+    xdebug: 'debug,develop'
+    overrides:
+      environment:
+        # Keep Xdebug settings in .lando/php.ini instead of Lando's defaults.
+        XDEBUG_CONFIG: ''
     config:
       php: .lando/php.ini
     build:

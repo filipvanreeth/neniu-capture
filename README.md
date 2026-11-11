@@ -534,3 +534,15 @@ een algemene naam of geen naam geven. Oudere records zonder deze metadata tonen
 proxyvertrouwensregels), niet uit het verzoek van degene die de verificatie bekijkt.
 De vooraf getoonde informatie over opgeslagen en gedeelde gegevens vermeldt
 ook deze velden.
+
+### Debuggen met Xdebug in Lando
+
+Xdebug is ingeschakeld voor de lokale PHP-service. De instellingen staan in
+`.lando/php.ini`. Na wijzigingen aan de Lando-configuratie: `lando rebuild -y`.
+
+Laat je IDE luisteren op poort `9003` en koppel containerpad `/app` aan de
+projectmap op je computer. Open een pagina met `?XDEBUG_TRIGGER=1` (of voeg
+`&XDEBUG_TRIGGER=1` toe als de URL al parameters heeft), of gebruik een
+Xdebug-browserextensie voor een debugcookie die ook bij uploads meegaat.
+Voor een CLI-script: `lando ssh -s appserver -c "XDEBUG_TRIGGER=1 php tests/verification.php"`.
+Zonder trigger start geen debugsessie. Deze configuratie geldt uitsluitend voor Lando.
